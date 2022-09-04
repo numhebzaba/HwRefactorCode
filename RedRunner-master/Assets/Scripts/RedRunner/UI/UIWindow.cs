@@ -57,7 +57,7 @@ namespace RedRunner.UI
 			}
 			OnOpened = null;
 			m_OnOpened.Invoke ( this );
-			OpenChanged ( true );
+			SetOpenChangedBool( true );
 		}
 
 		public void Closed ()
@@ -68,7 +68,12 @@ namespace RedRunner.UI
 			}
 			OnClosed = null;
 			m_OnClosed.Invoke ( this );
-			OpenChanged ( false );
+			SetOpenChangedBool( false );
+		}
+
+		public void SetOpenChangedBool(bool value)
+        {
+			OpenChanged(value);
 		}
 
 		public void OpenChanged ( bool isOpen )
