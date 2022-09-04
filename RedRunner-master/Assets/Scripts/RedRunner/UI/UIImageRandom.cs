@@ -12,10 +12,8 @@ namespace RedRunner.UI
 		[System.Serializable]
 		public struct RandomImageItem
 		{
-
 			public Color color;
 			public Sprite sprite;
-			
 		}
 
 		[SerializeField]
@@ -31,15 +29,28 @@ namespace RedRunner.UI
 			{
 				int index = Random.Range ( 0, m_RandomItems.Length );
 				m_PatternImage.sprite = m_RandomItems [ index ].sprite;
-				Color newColor = m_RandomItems [ index ].color;
-				newColor.a = Color.white.a;
-				m_ColorImage.color = newColor;
-				newColor = Color.white;
-				newColor.a = m_RandomItems [ index ].color.a;
-				m_PatternImage.color = newColor;
+				SetnewColorValue(index);
 			}
 		}
-	
+		public void SetnewColorValue(int index)
+        {
+			Color newColor = m_RandomItems[index].color;
+			newcolorSetting(newColor);
+			newColor.a = m_RandomItems[index].color.a;
+			Setm_PatternImageColor(newColor);
+		}
+		public void newcolorSetting(Color newColor)
+        {
+			newColor.a = Color.white.a;
+			m_ColorImage.color = newColor;
+			newColor = Color.white;
+		}
+		public void Setm_PatternImageColor(Color newColor)
+        {
+			m_PatternImage.color = newColor;
+		}
+
+
 	}
 
 }
