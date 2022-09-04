@@ -8,7 +8,7 @@ namespace RedRunner.Utilities
 	public class CameraController : MonoBehaviour
 	{
 
-		public delegate void ParallaxCameraDelegate ( Vector3 deltaMovement );
+		public delegate void ParallaxCameraDelegate(Vector3 deltaMovement);
 
 		public ParallaxCameraDelegate onCameraTranslate;
 
@@ -46,70 +46,79 @@ namespace RedRunner.Utilities
 				return m_FastMove;
 			}
 			set
-			{
 				m_FastMove = value;
-			}
 		}
-
-		void Awake ()
-		{
-			m_Singleton = this;
-			m_ShakeControl = GetComponent<CameraControl> ();
-		}
-
-		void Start ()
-		{
-			m_OldPosition = transform.position;
-		}
-
-		void Update ()
-		{
-//			if (!m_ShakeControl.IsShaking) {
-			Follow ();
-//			}
-			if ( transform.position != m_OldPosition )
-			{
-				if ( onCameraTranslate != null )
-				{
-					Vector3 delta = m_OldPosition - transform.position;
-					onCameraTranslate ( delta );
-				}
-				m_OldPosition = transform.position;
-			}
-		}
-
-		public void Follow ()
-		{
-			float speed = m_Speed;
-			if ( m_FastMove )
-			{
-				speed = m_FastMoveSpeed;
-			}
-			Vector3 cameraPosition = transform.position;
-			Vector3 targetPosition = m_Followee.position;
-			if ( targetPosition.x - m_Camera.orthographicSize * m_Camera.aspect > m_MinX )
-			{
-				cameraPosition.x = targetPosition.x;
-			}
-			else
-			{
-				cameraPosition.x = m_MinX + m_Camera.orthographicSize * m_Camera.aspect;
-			}
-			if ( targetPosition.y - m_Camera.orthographicSize > m_MinY )
-			{
-				cameraPosition.y = targetPosition.y;
-			}
-			else
-			{
-				cameraPosition.y = m_MinY + m_Camera.orthographicSize;
-			}
-			transform.position = Vector3.MoveTowards ( transform.position, cameraPosition, speed );
-			if ( transform.position == targetPosition && m_FastMove )
-			{
-				m_FastMove = false;
-			}
-		}
-
 	}
 
+	void Awake()
+	{
+		m_Singleton = this;
+		m_ShakeControl = GetComponent<CameraControl>();
+	}
+
+	void Start()
+	{
+		m_OldPosition = transform.position;
+	}
+
+	void Update()
+	{
+		//if (!m_ShakeControl.IsShaking) {
+		Follow();
+		//}
+		if (transform.position != m_OldPosition)
+		{
+			onCameraTranslateIsNotNull();
+			m_OldPosition = transform.position;
+		}
+	}
+	public void onCameraTranslateIsNotNull()
+	{
+		if (onCameraTranslate != null)
+		{
+			Vector3 delta = m_OldPosition - transform.position;
+			onCameraTranslate(delta);
+		}
+	}
+	public void Follow()
+	{
+		float speed = m_Speed;
+		Ism_FastMoveTrue(speed);
+		Vector3 cameraPosition = transform.position;
+		Vector3 targetPosition = m_Followee.position;
+
+		CheckPosition(cameraPosition,targetPosition);
+		
+	}
+	public void Ism_FastMoveTrue(float speed)
+	{
+		if (m_FastMove)
+			speed = m_FastMoveSpeed;
+	}
+	public void CheckPosition(Vector3 cameraPosition,Vector3 targetPosition)
+	{
+		IsTargetPositionX_Morethan_m_MinX(cameraPosition, targetPosition);
+		IsTargetPositionY_Morethan_m_MinY(cameraPosition, targetPosition);
+		transform.position = Vector3.MoveTowards(transform.position, cameraPosition, speed);
+		IsTranformPositionEqualTargetPosition(targetPosition);
+	}
+	public void IsTargetPositionX_Morethan_m_MinX(Vector3 cameraPosition, Vector3 targetPosition)
+    {
+		if (targetPosition.x - m_Camera.orthographicSize * m_Camera.aspect > m_MinX)
+			cameraPosition.x = targetPosition.x;
+		else
+			cameraPosition.x = m_MinX + m_Camera.orthographicSize * m_Camera.aspect;
+	}
+	public void IsTargetPositionY_Morethan_m_MinY(Vector3 cameraPosition,Vector3 targetPosition)
+    {
+		if (targetPosition.y - m_Camera.orthographicSize > m_MinY)
+			cameraPosition.y = targetPosition.y;
+		else
+			cameraPosition.y = m_MinY + m_Camera.orthographicSize;
+	}
+	public void IsTranformPositionEqualTargetPosition(Vector3 targetPosition)
+    {
+		if (transform.position == targetPosition && m_FastMove)
+			m_FastMove = false;
+	}
 }
