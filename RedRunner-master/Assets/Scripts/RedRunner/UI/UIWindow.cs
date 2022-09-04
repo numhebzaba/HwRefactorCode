@@ -35,13 +35,18 @@ namespace RedRunner.UI
 		public void Open ()
 		{
 			m_OnOpen.Invoke ( this );
-			m_Animator.SetBool ( "Open", true );
+			Setm_AnimatorBool( "Open", true );
 		}
 
 		public void Close ()
 		{
 			m_OnClose.Invoke ( this );
-			m_Animator.SetBool ( "Open", false );
+			Setm_AnimatorBool( "Open", false );
+		}
+		
+		public void Setm_AnimatorBool(string parameterName , bool value)
+        {
+			m_Animator.SetBool(parameterName, value);
 		}
 
 		public void Opened ()
