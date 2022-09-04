@@ -52,9 +52,7 @@ namespace RedRunner.UI
 		public void Opened ()
 		{
 			if ( OnOpened != null )
-			{
 				OnOpened ();
-			}
 			OnOpened = null;
 			m_OnOpened.Invoke ( this );
 			SetOpenChangedBool( true );
@@ -63,9 +61,7 @@ namespace RedRunner.UI
 		public void Closed ()
 		{
 			if ( OnClosed != null )
-			{
 				OnClosed ();
-			}
 			OnClosed = null;
 			m_OnClosed.Invoke ( this );
 			SetOpenChangedBool( false );
