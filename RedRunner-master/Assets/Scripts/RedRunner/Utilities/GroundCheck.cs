@@ -36,27 +36,36 @@ namespace RedRunner.Utilities
 			Vector2 center = new Vector2 (m_Collider2D.bounds.center.x, m_Collider2D.bounds.center.y);
 			Vector2 right = new Vector2 (m_Collider2D.bounds.min.x, m_Collider2D.bounds.center.y);
 		
-			RaycastHit2D hit1 = Physics2D.Raycast (left, new Vector2 (0f, -1f), m_RayDistance, LayerMask.GetMask (GROUND_LAYER_NAME));
-			Debug.DrawRay (left, new Vector2 (0f, -m_RayDistance));
-			bool grounded1 = hit1 != null && hit1.collider != null && hit1.collider.CompareTag (GROUND_TAG);
-		
-			RaycastHit2D hit2 = Physics2D.Raycast (center, new Vector2 (0f, -1f), m_RayDistance, LayerMask.GetMask (GROUND_LAYER_NAME));
-			Debug.DrawRay (center, new Vector2 (0f, -m_RayDistance));
-			bool grounded2 = hit2 != null && hit2.collider != null && hit2.collider.CompareTag (GROUND_TAG);
-		
-			RaycastHit2D hit3 = Physics2D.Raycast (right, new Vector2 (0f, -1f), m_RayDistance, LayerMask.GetMask (GROUND_LAYER_NAME));
-			Debug.DrawRay (right, new Vector2 (0f, -m_RayDistance));
-			bool grounded3 = hit3 != null && hit3.collider != null && hit3.collider.CompareTag (GROUND_TAG);
+			DebugAllRaycast();
 
+			m_IsGrounded = grounded;
+		}
+		public void DebugAllRaycast(Vector2 left,Vector2 center,Vector2 right)
+		{
+			bool grounded1,grounded2,grounded3;
+			DebugEachRaycast(left,center,right,grounded1,grounded2,grounded3);
 			bool grounded = grounded1 || grounded2 || grounded3;
-		
+			checkGrounded(grounded);
+		}
+		public void DebugEachRaycast(Vector2 left,Vector2 center,Vector2 right,bool grounded1,bool grounded2,bool grounded3)
+		{
+			DebugOneRaycast(left,grounded1);
+			DebugOneRaycast(center,grounded2);
+			DebugOneRaycast(right,grounded3);
+		}
+		public void DebugOneRaycast(Vector2 direction,bool groundedIndex)
+		{
+			RaycastHit2D hit1 = Physics2D.Raycast (direction, new Vector2 (0f, -1f), m_RayDistance, LayerMask.GetMask (GROUND_LAYER_NAME));
+			Debug.DrawRay (direction, new Vector2 (0f, -m_RayDistance));
+			groundedIndex = hit1 != null && hit1.collider != null && hit1.collider.CompareTag (GROUND_TAG);
+		}
+		public void checkGrounded(bool grounded)
+		{
 			if (grounded && !m_IsGrounded) {
 				if (OnGrounded != null) {
 					OnGrounded ();
 				}
 			}
-
-			m_IsGrounded = grounded;
 		}
 
 	}
