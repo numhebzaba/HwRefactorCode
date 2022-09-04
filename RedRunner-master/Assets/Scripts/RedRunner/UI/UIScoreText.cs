@@ -29,10 +29,12 @@ namespace RedRunner.UI
 		{
 			text = newScore.ToLength ();
 			if ( newScore > highScore && !m_Collected )
-			{
-				m_Collected = true;
-				GetComponent<Animator> ().SetTrigger ( "Collect" );
-			}
+				Setm_CollectedBoolAndSetTriggerValue();
+		}
+		public void Setm_CollectedBoolAndSetTriggerValue()
+        {
+			m_Collected = true;
+			GetComponent<Animator>().SetTrigger("Collect");
 		}
 
 	}
