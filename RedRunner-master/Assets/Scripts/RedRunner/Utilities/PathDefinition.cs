@@ -66,53 +66,63 @@ namespace RedRunner.Utilities
 			if ( transform.childCount != m_Points.Count )
 			{
 				m_Points.Clear ();
-				for ( int i = 0; i < transform.childCount; i++ )
-				{
-					Transform child = transform.GetChild ( i );
-					PathPoint point = child.GetComponent<PathPoint> ();
-					if ( point != null )
-					{
-						m_Points.Add ( point );
-					}
-				}
+				ForLoopSetChildAndPoint();
 			}
 		}
 		#endif
-
+		public void ForLoopSetChildAndPoint()
+		{
+			for ( int i = 0; i < transform.childCount; i++ )
+				{
+					Transform child = transform.GetChild ( i );
+					PathPoint point = child.GetComponent<PathPoint> ();
+					IsPointNull(point);
+				}
+		}
+		public void IsPointNull(PathPoint point)
+		{
+			if ( point != null )
+				m_Points.Add ( point );
+		}
 		public IEnumerator<PathPoint> GetPathEnumerator ()
 		{
 			// Exit when points count is smaller one
 			if ( m_Points == null || m_Points.Count < 1 )
 				yield break;
-
 			var direction = 1;
 			var index = 0;
 			m_CurrentPointIndex = index;
+			whileLoopm_CurrentPointIndex(direction,index);
+		}
+		public void whileLoopm_CurrentPointIndex(var direction,var index)
+		{
 			while ( true )
 			{
 				yield return m_Points [ index ];
-				if ( m_Points.Count == 1 )
-					continue;
-				
-				if ( index <= 0 )
-				{
-					direction = 1;
-				}
-				else if ( index >= m_Points.Count - 1 )
-				{
-					direction = -1;
-				}
-
-				if ( index == m_Points.Count - 1 && m_ContinueToStart )
-				{
-					index = 0;
-				}
-				else
-				{
-					index = index + direction;
-				}
+				Ism_PointsCountEqualOne();
+				IsIndexMorethanZero(direction,index);
+				IsIndexEqual_m_PointsDeleteOneAndZero(direction,index);
 				m_CurrentPointIndex = index;
 			}
+		}
+		public void Ism_PointsCountEqualOne()
+		{
+			if ( m_Points.Count == 1 )
+				continue;
+		}
+		public void IsIndexMorethanZero(var direction,var index)
+		{
+			if ( index <= 0 )
+				direction = 1;
+			else if ( index >= m_Points.Count - 1 )
+				direction = -1;	
+		}
+		public void IsIndexEqual_m_PointsDeleteOneAndZero(var direction,var index)
+		{
+			if ( index == m_Points.Count - 1 && m_ContinueToStart )
+				index = 0;
+			else
+				index = index + direction;
 		}
 
 		public void OnDrawGizmos ()
@@ -120,6 +130,10 @@ namespace RedRunner.Utilities
 			if ( m_Points == null || m_Points.Count < 2 )
 				return;
 
+			ForLoopDrawGizmos();
+		}
+		public void ForLoopDrawGizmos()
+		{
 			for ( var i = 1; i < m_Points.Count; i++ )
 			{
 				Gizmos.DrawLine ( m_Points [ i - 1 ].transform.position, m_Points [ i ].transform.position );
