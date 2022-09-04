@@ -23,15 +23,19 @@ namespace RedRunner.UI
 		public void Toggle ()
 		{
 			if ( m_IsOpen )
-			{
-				m_IsOpen = false;
-				SetTrigger ( "Close" );
-			}
+				Setm_IsOpenBooltoFalse();
 			else
-			{
-				m_IsOpen = true;
-				SetTrigger ( "Open" );
-			}
+				Setm_IsOpenBooltoTrue();
+		}
+		public void Setm_IsOpenBooltoFalse()
+        {
+			m_IsOpen = false;
+			SetTrigger("Close");
+		}
+		public void Setm_IsOpenBooltoTrue()
+        {
+			m_IsOpen = true;
+			SetTrigger("Open");
 		}
 
 		public void SetTrigger ( string trigger )
