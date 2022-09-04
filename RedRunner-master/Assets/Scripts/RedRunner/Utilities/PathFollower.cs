@@ -59,20 +59,27 @@ namespace RedRunner.Utilities
 
 		void Start ()
 		{
-			if (m_PathDefinition == null) {
-				return;
-			}
+			Ism_PathDefinitionNull();
 
 			m_CurrentPoint = m_PathDefinition.GetPathEnumerator ();
 			m_CurrentPoint.MoveNext ();
 
-			if (m_CurrentPoint.Current == null)
-				return;
+			Im_CurrentPointNull();
 
 			transform.position = m_CurrentPoint.Current.transform.position;
 			StartCoroutine (CalcVelocity ());
 		}
-
+		public void Ism_PathDefinitionNull()
+		{
+			if (m_PathDefinition == null) {
+				return;
+			}
+		}
+		public void Im_CurrentPointNull()
+		{
+			if (m_CurrentPoint.Current == null)
+				return;
+		}
 		void OnDrawGizmos ()
 		{
 			if (m_Smart) {
@@ -81,6 +88,25 @@ namespace RedRunner.Utilities
 		}
 
 		void Update ()
+		{
+			ifm_Smart();
+
+			if (m_CurrentPoint == null || m_CurrentPoint.Current == null || m_Stopped || !GameManager.Singleton.gameRunning) {
+				return;
+			}
+
+			float speed = Time.deltaTime * m_CurrentPoint.Current.speed;
+			IfMoveType(speed);
+
+			var distanceSquared = (transform.position - m_CurrentPoint.Current.transform.position).sqrMagnitude;
+			if (distanceSquared < m_Step * m_Step) {
+				m_Stopped = true;
+				if (!m_IsMovingNext) {
+					StartCoroutine (MoveNext ());
+				}
+			}
+		}
+		public void ifm_Smart()
 		{
 			if (m_Smart) {
 				Collider2D[] colliders = Physics2D.OverlapBoxAll (transform.position + m_RangeOffset, m_RangeSize, 0f, LayerMask.GetMask ("Characters"));
@@ -93,12 +119,9 @@ namespace RedRunner.Utilities
 			} else {
 				m_Stopped = false;
 			}
-
-			if (m_CurrentPoint == null || m_CurrentPoint.Current == null || m_Stopped || !GameManager.Singleton.gameRunning) {
-				return;
-			}
-
-			float speed = Time.deltaTime * m_CurrentPoint.Current.speed;
+		}
+		public void IfMoveType(float speed)
+		{
 			if (m_CurrentPoint.Current.moveType == PathPoint.MoveType.MoveTowards) {
 				transform.position = Vector3.MoveTowards (transform.position, m_CurrentPoint.Current.transform.position, speed);
 			} else if (m_CurrentPoint.Current.moveType == PathPoint.MoveType.Lerp) {
@@ -111,14 +134,6 @@ namespace RedRunner.Utilities
 				m_OverTimeSpeed += m_CurrentPoint.Current.acceleration;
 				if (m_OverTimeSpeed > m_CurrentPoint.Current.maxSpeed) {
 					m_OverTimeSpeed = m_CurrentPoint.Current.maxSpeed;
-				}
-			}
-
-			var distanceSquared = (transform.position - m_CurrentPoint.Current.transform.position).sqrMagnitude;
-			if (distanceSquared < m_Step * m_Step) {
-				m_Stopped = true;
-				if (!m_IsMovingNext) {
-					StartCoroutine (MoveNext ());
 				}
 			}
 		}
@@ -136,15 +151,19 @@ namespace RedRunner.Utilities
 		{
 			m_IsMovingNext = true;
 			float delay = m_CurrentPoint.Current.delay;
+			Ism_FollowDelaysEqualUseGlobalDelay(delay);
+			yield return new WaitForSeconds (delay);
+			m_OverTimeSpeed = 0f;
+			m_CurrentPoint.MoveNext ();
+			m_IsMovingNext = false;
+		}
+		public void Ism_FollowDelaysEqualUseGlobalDelay(float delay)
+		{
 			if (m_FollowDelays && m_PathDefinition.UseGlobalDelay) {
 				delay = m_PathDefinition.GlobalDelay;
 			} else if (!m_FollowDelays) {
 				delay = m_Delay;
 			}
-			yield return new WaitForSeconds (delay);
-			m_OverTimeSpeed = 0f;
-			m_CurrentPoint.MoveNext ();
-			m_IsMovingNext = false;
 		}
 
 	}
