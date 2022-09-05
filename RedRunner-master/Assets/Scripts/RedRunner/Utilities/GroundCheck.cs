@@ -36,13 +36,13 @@ namespace RedRunner.Utilities
 			Vector2 center = new Vector2 (m_Collider2D.bounds.center.x, m_Collider2D.bounds.center.y);
 			Vector2 right = new Vector2 (m_Collider2D.bounds.min.x, m_Collider2D.bounds.center.y);
 		
-			DebugAllRaycast();
+			DebugAllRaycast(left, center, right);
 
-			m_IsGrounded = grounded;
+			
 		}
 		public void DebugAllRaycast(Vector2 left,Vector2 center,Vector2 right)
 		{
-			bool grounded1,grounded2,grounded3;
+			bool grounded1 = false,grounded2 = false, grounded3 = false;
 			DebugEachRaycast(left,center,right,grounded1,grounded2,grounded3);
 			bool grounded = grounded1 || grounded2 || grounded3;
 			checkGrounded(grounded);
@@ -66,6 +66,7 @@ namespace RedRunner.Utilities
 					OnGrounded ();
 				}
 			}
+			m_IsGrounded = grounded;
 		}
 
 	}

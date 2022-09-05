@@ -94,30 +94,27 @@ namespace RedRunner.Utilities
 			m_CurrentPointIndex = index;
 			whileLoopm_CurrentPointIndex(direction,index);
 		}
-		public void whileLoopm_CurrentPointIndex(var direction,var index)
+		public IEnumerable whileLoopm_CurrentPointIndex(int direction,int index)
 		{
 			while ( true )
 			{
 				yield return m_Points [ index ];
-				Ism_PointsCountEqualOne();
+				if ( m_Points.Count == 1)
+					continue;
 				IsIndexMorethanZero(direction,index);
 				IsIndexEqual_m_PointsDeleteOneAndZero(direction,index);
 				m_CurrentPointIndex = index;
 			}
 		}
-		public void Ism_PointsCountEqualOne()
-		{
-			if ( m_Points.Count == 1 )
-				continue;
-		}
-		public void IsIndexMorethanZero(var direction,var index)
+		
+		public void IsIndexMorethanZero(int direction,int index)
 		{
 			if ( index <= 0 )
 				direction = 1;
 			else if ( index >= m_Points.Count - 1 )
 				direction = -1;	
 		}
-		public void IsIndexEqual_m_PointsDeleteOneAndZero(var direction,var index)
+		public void IsIndexEqual_m_PointsDeleteOneAndZero(int direction,int index)
 		{
 			if ( index == m_Points.Count - 1 && m_ContinueToStart )
 				index = 0;
