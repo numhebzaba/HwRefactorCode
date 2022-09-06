@@ -24,6 +24,7 @@ namespace RedRunner
 
 		[Header ("Audio Sources")]
 		[Space]
+		
 		[SerializeField]
 		protected AudioSource m_MusicAudioSource;
 		[SerializeField]
@@ -94,6 +95,7 @@ namespace RedRunner
 			audio.Play ();
 		}
 
+		
 		public void PlayChestSound (Vector3 position)
 		{
 			PlaySoundOn (m_CoinAudioSource, m_ChestSound);
