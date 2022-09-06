@@ -42,12 +42,12 @@ public class PropertyEvent
 
     void ChangeValue(MonoBehaviour mb = null)
     {
-        Callbacks.RemoveAll(el =>
-        {
-            try
-            {
-                // Here comes the magic: if monoBehaviour has been already removed we'll have null here
-                if (el.HasMb && el.Mb == null)
+        ChangeCallbacks();
+    }
+}
+void ChangeHasMb()
+{
+    if (el.HasMb && el.Mb == null)
                     return true;
 
                 if (!el.HasMb || (el.Mb.gameObject.activeInHierarchy && el.Mb.enabled) || el.CallEvenIfDisabled)
@@ -57,6 +57,15 @@ public class PropertyEvent
                             el.Changed();
                     }
                 return false;
+}
+
+void ChangeCallbacks()
+{
+    Callbacks.RemoveAll(el =>
+        {
+            try
+            {
+                ChangeHasMb();
             }
             catch (Exception ex)
             {
@@ -64,8 +73,8 @@ public class PropertyEvent
                 return false;
             }
         });
-    }
 }
+
 
 public class PropertyEvent<T>
 {
@@ -113,12 +122,13 @@ public class PropertyEvent<T>
 
     public void Fire(T value, MonoBehaviour mb = null)
     {
-        Callbacks.RemoveAll(el =>
-        {
-            try
-            {
-                // Here comes the magic: if monoBehaviour has been already removed we'll have null here
-                if (el.HasMb && el.Mb == null)
+        FireCallbacks();
+    }
+}
+
+void FireHasMb()
+{
+     if (el.HasMb && el.Mb == null)
                     return true;
 
                 if (!el.HasMb || (el.Mb.gameObject.activeInHierarchy && el.Mb.enabled) || el.CallEvenIfDisabled)
@@ -128,6 +138,16 @@ public class PropertyEvent<T>
                             el.Changed(value);
                     }
                 return false;
+}
+
+void FireCallbacks()
+{
+    Callbacks.RemoveAll(el =>
+        {
+            try
+            {
+                // Here comes the magic: if monoBehaviour has been already removed we'll have null here
+                FireHasMb();
             }
             catch (Exception ex)
             {
