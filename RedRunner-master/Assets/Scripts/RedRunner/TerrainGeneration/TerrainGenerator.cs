@@ -79,11 +79,18 @@ namespace RedRunner.TerrainGeneration
 			m_Blocks = new Dictionary<Vector3, Block> ();
 			m_BackgroundBlocks = new Dictionary<Vector3, BackgroundBlock> ();
 			m_BackgroundLayers = new BackgroundLayer[m_Settings.BackgroundLayers.Length];
-			for ( int i = 0; i < m_Settings.BackgroundLayers.Length; i++ )
-			{
-				m_BackgroundLayers [ i ] = m_Settings.BackgroundLayers [ i ];
-			}
+			
+			SetBG();
+
 			GameManager.OnReset += Reset;
+		}
+
+		void SetBG()
+        {
+			for (int i = 0; i < m_Settings.BackgroundLayers.Length; i++)
+			{
+				m_BackgroundLayers[i] = m_Settings.BackgroundLayers[i];
+			}
 		}
 
 		protected virtual void Reset ()
@@ -93,10 +100,12 @@ namespace RedRunner.TerrainGeneration
 			m_CurrentX = 0f;
 			m_LastBlock = null;
 			m_LastBackgroundBlock = null;
+			
 			for ( int i = 0; i < m_BackgroundLayers.Length; i++ )
 			{
 				m_BackgroundLayers [ i ].Reset ();
 			}
+
 			m_FathestBackgroundX = 0f;
 			m_Blocks.Clear ();
 			m_BackgroundBlocks.Clear ();
@@ -133,55 +142,18 @@ namespace RedRunner.TerrainGeneration
 				Block block = null;
 				Vector3 current = new Vector3 ( m_CurrentX, 0f, 0f );
 				float newX = 0f;
-				if ( m_GeneratedStartBlocksCount < m_Settings.StartBlocksCount || m_Settings.StartBlocksCount <= 0 )
-				{
-					isStart = true;
-					block = ChooseFrom ( m_Settings.StartBlocks );
-				}
-				else if ( m_GeneratedMiddleBlocksCount < m_Settings.MiddleBlocksCount || m_Settings.MiddleBlocksCount <= 0 )
-				{
-					isMiddle = true;
-					block = ChooseFrom ( m_Settings.MiddleBlocks );
-				}
-				else if ( m_GeneratedEndBlocksCount < m_Settings.EndBlocksCount || m_Settings.EndBlocksCount <= 0 )
-				{
-					isEnd = true;
-					block = ChooseFrom ( m_Settings.EndBlocks );
-				}
-				if ( m_LastBlock != null )
-				{
-					newX = m_CurrentX + m_LastBlock.Width;
-				}
-				else
-				{
-					newX = 0f;
-				}
+				GenerateBlockFromStart();
+
+				CheckLastBlock();
+
 				if ( block != null && ( m_LastBlock == null || newX < m_Character.transform.position.x + m_GenerateRange ) )
 				{
-					if ( isStart )
-					{
-						if ( m_Settings.StartBlocksCount > 0 )
-						{
-							m_GeneratedStartBlocksCount++;
-						}
-					}
-					else if ( isMiddle )
-					{
-						if ( m_Settings.MiddleBlocksCount > 0 )
-						{
-							m_GeneratedMiddleBlocksCount++;
-						}
-					}
-					else if ( isEnd )
-					{
-						if ( m_Settings.EndBlocksCount > 0 )
-						{
-							m_GeneratedEndBlocksCount++;
-						}
-					}
+					CheckWhereToGenerate();
+
 					CreateBlock ( block, current );
 				}
 			}
+
 			for ( int i = 0; i < m_BackgroundLayers.Length; i++ )
 			{
 				int random = Random.Range ( 0, 2 );
@@ -193,6 +165,7 @@ namespace RedRunner.TerrainGeneration
 				Vector3 current = new Vector3 ( m_BackgroundLayers [ i ].CurrentX, 0f, 0f );
 				BackgroundBlock block = ( BackgroundBlock )ChooseFrom ( m_BackgroundLayers [ i ].Blocks );
 				float newX = 0f;
+
 				if ( m_BackgroundLayers [ i ].LastBlock != null )
 				{
 					newX = m_BackgroundLayers [ i ].CurrentX + m_BackgroundLayers [ i ].LastBlock.Width;
@@ -201,9 +174,66 @@ namespace RedRunner.TerrainGeneration
 				{
 					newX = 0f;
 				}
+
 				if ( block != null && ( m_BackgroundLayers [ i ].LastBlock == null || newX < m_Character.transform.position.x + m_BackgroundGenerateRange ) )
 				{
 					CreateBackgroundBlock ( block, current, m_BackgroundLayers [ i ], i );
+				}
+			}
+		}
+
+		public void GenerateBlockFromStart()
+        {
+			if (m_GeneratedStartBlocksCount < m_Settings.StartBlocksCount || m_Settings.StartBlocksCount <= 0)
+			{
+				isStart = true;
+				block = ChooseFrom(m_Settings.StartBlocks);
+			}
+			else if (m_GeneratedMiddleBlocksCount < m_Settings.MiddleBlocksCount || m_Settings.MiddleBlocksCount <= 0)
+			{
+				isMiddle = true;
+				block = ChooseFrom(m_Settings.MiddleBlocks);
+			}
+			else if (m_GeneratedEndBlocksCount < m_Settings.EndBlocksCount || m_Settings.EndBlocksCount <= 0)
+			{
+				isEnd = true;
+				block = ChooseFrom(m_Settings.EndBlocks);
+			}
+		}
+
+		public void CheckLastBlock()
+        {
+			if (m_LastBlock != null)
+			{
+				newX = m_CurrentX + m_LastBlock.Width;
+			}
+			else
+			{
+				newX = 0f;
+			}
+		}
+
+		public void CheckWhereToGenerate()
+        {
+			if (isStart)
+			{
+				if (m_Settings.StartBlocksCount > 0)
+				{
+					m_GeneratedStartBlocksCount++;
+				}
+			}
+			else if (isMiddle)
+			{
+				if (m_Settings.MiddleBlocksCount > 0)
+				{
+					m_GeneratedMiddleBlocksCount++;
+				}
+			}
+			else if (isEnd)
+			{
+				if (m_Settings.EndBlocksCount > 0)
+				{
+					m_GeneratedEndBlocksCount++;
 				}
 			}
 		}
@@ -219,6 +249,7 @@ namespace RedRunner.TerrainGeneration
 				}
 			}
 			List<BackgroundBlock> backgroundBlocksToRemove = new List<BackgroundBlock> ();
+
 			foreach ( KeyValuePair<Vector3, BackgroundBlock> block in m_BackgroundBlocks )
 			{
 				if ( block.Value.transform.position.x - m_FathestBackgroundX > m_DestroyRange )
