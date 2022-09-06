@@ -60,22 +60,42 @@ namespace RedRunner.Enemies
 		void OnCollisionStay2D (Collision2D collision2D)
 		{
 			if (collision2D.collider.CompareTag ("Player")) {
-				if (m_AudioSource.clip != m_SawingSound) {
-					m_AudioSource.clip = m_SawingSound;
-				} else if (!m_AudioSource.isPlaying) {
-					m_AudioSource.Play ();
-				}
+				PlaySawingSound();
 			}
 		}
 
 		void OnCollisionExit2D (Collision2D collision2D)
 		{
 			if (collision2D.collider.CompareTag ("Player")) {
-				if (m_AudioSource.clip != m_DefaultSound) {
-					m_AudioSource.clip = m_DefaultSound;
-				}
-				m_AudioSource.Play ();
+
+				PlayDefaultSound();
+				PlaySound();
 			}
+		}
+
+        void PlaySawingSound()
+        {
+			if (m_AudioSource.clip != m_SawingSound)
+			{
+				m_AudioSource.clip = m_SawingSound;
+			}
+			else if (!m_AudioSource.isPlaying)
+			{
+				PlaySound();
+			}
+		}
+
+		void PlayDefaultSound()
+        {
+			if (m_AudioSource.clip != m_DefaultSound)
+			{
+				m_AudioSource.clip = m_DefaultSound;
+			}
+		}
+
+		void PlaySound()
+        {
+			m_AudioSource.Play();
 		}
 
 		public override void Kill (Character target)
