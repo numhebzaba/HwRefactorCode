@@ -139,6 +139,7 @@ namespace RedRunner.Collectables
 		public override void OnCollisionEnter2D (Collision2D collision2D)
 		{
 			Character character = collision2D.collider.GetComponent<Character> ();
+
 			if (!m_UseOnTriggerEnter2D && character != null) {
 				m_CurrentCharacter = character;
 				Collect ();
@@ -148,6 +149,7 @@ namespace RedRunner.Collectables
 		public override void OnTriggerEnter2D (Collider2D other)
 		{
 			Character character = other.GetComponent<Character> ();
+
 			if (m_UseOnTriggerEnter2D && character != null) {
 				m_CurrentCharacter = character;
 				Collect ();
@@ -161,16 +163,29 @@ namespace RedRunner.Collectables
 
 		public virtual void OnChestOpened ()
 		{
-			AudioManager.Singleton.PlayChestSound (transform.position);
-			m_ParticleSystem.Play ();
+			PlayChestSound();
+
 			int coinsCount = Random.Range (m_MinimumCoins, m_MaximumCoins);
-			for (int i = 0; i < coinsCount; i++) {
-				CoinRigidbody2D coin = Instantiate<CoinRigidbody2D> (m_CoinRigidbody2D, m_SpawnPoint.position, Quaternion.identity, transform);
-				float x = Random.Range (m_RandomForceXMinimum, m_RandomForceXMaximum);
-				float y = Random.Range (m_RandomForceYMinimum, m_RandomForceYMaximum);
-				Vector2 force = new Vector2 (x, y);
-				coin.Rigidbody2D.AddForce (force, ForceMode2D.Impulse);
-				StartCoroutine (IgnoreAndEnableCollision (m_CurrentCharacter.Collider2D, coin.Collider2D));
+
+			DoWithCoins();
+		}
+
+		public void PlayChestSound()
+        {
+			AudioManager.Singleton.PlayChestSound(transform.position);
+			m_ParticleSystem.Play();
+		}
+
+		public void DoWithCoins()
+        {
+			for (int i = 0; i < coinsCount; i++)
+			{
+				CoinRigidbody2D coin = Instantiate<CoinRigidbody2D>(m_CoinRigidbody2D, m_SpawnPoint.position, Quaternion.identity, transform);
+				float x = Random.Range(m_RandomForceXMinimum, m_RandomForceXMaximum);
+				float y = Random.Range(m_RandomForceYMinimum, m_RandomForceYMaximum);
+				Vector2 force = new Vector2(x, y);
+				coin.Rigidbody2D.AddForce(force, ForceMode2D.Impulse);
+				StartCoroutine(IgnoreAndEnableCollision(m_CurrentCharacter.Collider2D, coin.Collider2D));
 			}
 		}
 
