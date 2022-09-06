@@ -59,6 +59,7 @@ public class Property<T>
         onChanged(currentValue, currentValue);
     }
 
+    
     public void RemoveEvent(Action<T> onChanged)
     {
         Callbacks.RemoveAll(el => el.Changed == onChanged);
@@ -98,19 +99,43 @@ public class Property<T>
         {
             try
             {
-                // Here comes the magic: if monoBehaviour has been already removed we'll have null here
-                if (el.HasMb && el.Mb == null)
-                    return true;
-
-                if (!el.HasMb || (el.Mb.gameObject.activeInHierarchy && el.Mb.enabled) || el.CallEvenIfDisabled)
-                    if (mb == null || el.Mb == mb)
-                    {
-                        if (el.Changed != null)
-                            el.Changed(currentValue);
-                        if (el.ChangedWithPrev != null)
-                            el.ChangedWithPrev(currentValue, oldValue);
-                    }
+                HasMb();
+            }
+            catch (Exception ex)
+            {
+                UnityEngine.Debug.LogException(ex);
                 return false;
+            }
+        }
+    }
+}
+
+void Change()
+{
+    if (el.Changed != null)
+       el.Changed(currentValue);
+    if (el.ChangedWithPrev != null)
+    el.ChangedWithPrev(currentValue, oldValue);
+}
+
+void HasMb()
+{
+    if (el.HasMb && el.Mb == null)
+        return true;
+    if (!el.HasMb || (el.Mb.gameObject.activeInHierarchy && el.Mb.enabled) || el.CallEvenIfDisabled)
+         if (mb == null || el.Mb == mb)
+        {
+         Change();
+        }
+        return false;
+}
+void Callbacks()
+{
+    Callbacks.RemoveAll(el =>
+        {
+            try
+            {
+                HasMb();
             }
             catch (Exception ex)
             {
@@ -120,3 +145,4 @@ public class Property<T>
         });
     }
 }
+
