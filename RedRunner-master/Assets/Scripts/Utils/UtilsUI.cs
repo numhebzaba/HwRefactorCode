@@ -10,8 +10,16 @@ namespace RedRunner.UI
     {
         public static void SetButtonAction(this Button button, Action action)
         {
-            button.onClick.RemoveAllListeners();
+            RemoveAllLis();
+            AddLis();
+        }
+        void AddLis()
+        {
             button.onClick.AddListener(() => action());
+        }
+        void RemoveAllLis()
+        {
+            button.onClick.RemoveAllListeners();
         }
     }
 }
