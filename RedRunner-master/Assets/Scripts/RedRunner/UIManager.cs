@@ -78,34 +78,16 @@ namespace RedRunner
         {
             if (Input.GetButtonDown("Cancel"))
             {
-                //Added enumeration to store screen info, aka type, so it will be easier to understand it
                 var pauseScreen = GetUIScreen(UIScreenInfo.PAUSE_SCREEN);
                 var ingameScreen = GetUIScreen(UIScreenInfo.IN_GAME_SCREEN);
-
-                //If the pause screen is not open : open it otherwise close it
-                if (!pauseScreen.IsOpen)
-                {
-                    if(m_ActiveScreen == ingameScreen)
-                    {
-                        if (IsAsScreenOpen())
-                            CloseAllScreens();
-
-                        OpenScreen(pauseScreen);
-                        GameManager.Singleton.StopGame();
-                    }
-                }
-                else 
-                {
-                    if (m_ActiveScreen == pauseScreen)
-                    {
-                        CloseScreen(pauseScreen);
-                        OpenScreen(ingameScreen);
-                        ////We are sure that we want to resume the game when we close a screen
-                        GameManager.Singleton.ResumeGame();
-                    }
-                }
+                PauseScreen();
             }
+            MouseDown();
+            
+        }
 
+        void MouseDown()
+        {
             if (Input.GetMouseButtonDown(0))
             {
                 Cursor.SetCursor(m_CursorClickTexture, Vector2.zero, CursorMode.Auto);
@@ -114,6 +96,41 @@ namespace RedRunner
             {
                 Cursor.SetCursor(m_CursorDefaultTexture, Vector2.zero, CursorMode.Auto);
             }
+        }
+        
+        void ScreenOpen()
+        {
+            if (IsAsScreenOpen())
+                            CloseAllScreens();
+
+                        OpenScreen(pauseScreen);
+                        GameManager.Singleton.StopGame();
+        }
+
+        void ActiveScreen()
+        {
+             if (m_ActiveScreen == pauseScreen)
+                    {
+                        CloseScreen(pauseScreen);
+                        OpenScreen(ingameScreen);
+                        ////We are sure that we want to resume the game when we close a screen
+                        GameManager.Singleton.ResumeGame();
+                    }
+        }
+
+        void PauseScreen()
+        {
+            if (!pauseScreen.IsOpen)
+                {
+                    if(m_ActiveScreen == ingameScreen)
+                    {
+                        ScreenOpen()
+                    }
+                }
+                else 
+                {
+                    ActiveScreen();
+                }
         }
 
         public void OpenWindow(UIWindow window)
