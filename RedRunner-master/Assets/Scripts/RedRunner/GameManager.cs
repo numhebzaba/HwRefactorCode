@@ -95,6 +95,14 @@ namespace RedRunner
             m_Singleton = this;
             m_Score = 0f;
 
+            SaveGameCoin();
+            SaveGameAudio();
+            SaveGameLastScore();
+            SaveGameHightScore();
+
+        }
+        void SaveGameCoin()
+        {
             if (SaveGame.Exists("coin"))
             {
                 m_Coin.Value = SaveGame.Load<int>("coin");
@@ -103,6 +111,10 @@ namespace RedRunner
             {
                 m_Coin.Value = 0;
             }
+                
+        }
+        void SaveGameAudio()
+        {
             if (SaveGame.Exists("audioEnabled"))
             {
                 SetAudioEnabled(SaveGame.Load<bool>("audioEnabled"));
@@ -111,6 +123,9 @@ namespace RedRunner
             {
                 SetAudioEnabled(true);
             }
+        }
+        void SaveGameLastScore()
+        {
             if (SaveGame.Exists("lastScore"))
             {
                 m_LastScore = SaveGame.Load<float>("lastScore");
@@ -119,6 +134,9 @@ namespace RedRunner
             {
                 m_LastScore = 0f;
             }
+        }
+        void SaveGameHightScore()
+        {
             if (SaveGame.Exists("highScore"))
             {
                 m_HighScore = SaveGame.Load<float>("highScore");
@@ -127,7 +145,6 @@ namespace RedRunner
             {
                 m_HighScore = 0f;
             }
-
         }
 
         void UpdateDeathEvent(bool isDead)
@@ -145,20 +162,29 @@ namespace RedRunner
         IEnumerator DeathCrt()
         {
             m_LastScore = m_Score;
-            if (m_Score > m_HighScore)
-            {
-                m_HighScore = m_Score;
-            }
-            if (OnScoreChanged != null)
-            {
-                OnScoreChanged(m_Score, m_HighScore, m_LastScore);
-            }
+            ScoreHigher();
+            ScoreChange();
+            
 
             yield return new WaitForSecondsRealtime(1.5f);
 
             EndGame();
             var endScreen = UIManager.Singleton.UISCREENS.Find(el => el.ScreenInfo == UIScreenInfo.END_SCREEN);
             UIManager.Singleton.OpenScreen(endScreen);
+        }
+        void ScoreHigher();
+        {
+            if (m_Score > m_HighScore)
+            {
+                m_HighScore = m_Score;
+            }
+        }
+        void ScoreChange()
+        {
+            if (OnScoreChanged != null)
+            {
+                OnScoreChanged(m_Score, m_HighScore, m_LastScore);
+            }
         }
 
         private void Start()
@@ -278,6 +304,8 @@ namespace RedRunner
                 OnReset();
             }
         }
+
+        
 
         public void ShareOnTwitter()
         {
