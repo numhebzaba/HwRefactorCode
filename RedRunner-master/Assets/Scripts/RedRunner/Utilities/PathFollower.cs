@@ -60,12 +60,8 @@ namespace RedRunner.Utilities
 		void Start ()
 		{
 			Ism_PathDefinitionNull();
-
-			m_CurrentPoint = m_PathDefinition.GetPathEnumerator ();
-			m_CurrentPoint.MoveNext ();
-
-			Im_CurrentPointNull();
-
+			setm_CurrentPoint();
+			Ism_CurrentPointNull();
 			transform.position = m_CurrentPoint.Current.transform.position;
 			StartCoroutine (CalcVelocity ());
 		}
@@ -75,10 +71,15 @@ namespace RedRunner.Utilities
 				return;
 			}
 		}
-		public void Im_CurrentPointNull()
+		public void Ism_CurrentPointNull()
 		{
 			if (m_CurrentPoint.Current == null)
 				return;
+		}
+		public void setm_CurrentPoint()
+        {
+			m_CurrentPoint = m_PathDefinition.GetPathEnumerator();
+			m_CurrentPoint.MoveNext();
 		}
 		void OnDrawGizmos ()
 		{
@@ -89,52 +90,98 @@ namespace RedRunner.Utilities
 
 		void Update ()
 		{
-			ifm_Smart();
-
+			Ifm_Smart();
 			if (m_CurrentPoint == null || m_CurrentPoint.Current == null || m_Stopped || !GameManager.Singleton.gameRunning) {
 				return;
 			}
-
 			float speed = Time.deltaTime * m_CurrentPoint.Current.speed;
 			IfMoveType(speed);
 
-			var distanceSquared = (transform.position - m_CurrentPoint.Current.transform.position).sqrMagnitude;
-			if (distanceSquared < m_Step * m_Step) {
-				m_Stopped = true;
-				if (!m_IsMovingNext) {
-					StartCoroutine (MoveNext ());
-				}
-			}
+			CheckdistanceSquared();
 		}
-		public void ifm_Smart()
+		public void Ifm_Smart()
 		{
 			if (m_Smart) {
 				Collider2D[] colliders = Physics2D.OverlapBoxAll (transform.position + m_RangeOffset, m_RangeSize, 0f, LayerMask.GetMask ("Characters"));
-				for (int i = 0; i < colliders.Length; i++) {
-					Character character = colliders [i].GetComponent<Character> ();
-					if (character != null) {
-						m_Stopped = false;
-					}
-				}
-			} else {
-				m_Stopped = false;
+				LoopColliderArrayCharacter(colliders);
+				return;
+			}
+			m_Stopped = false;
+		}
+		public void LoopColliderArrayCharacter(Collider2D[] colliders)
+        {
+			for (int index = 0; index < colliders.Length; index++)
+			{
+				Character character = colliders[index].GetComponent<Character>();
+				if (character != null)
+					m_Stopped = false;
 			}
 		}
 		public void IfMoveType(float speed)
 		{
-			if (m_CurrentPoint.Current.moveType == PathPoint.MoveType.MoveTowards) {
-				transform.position = Vector3.MoveTowards (transform.position, m_CurrentPoint.Current.transform.position, speed);
-			} else if (m_CurrentPoint.Current.moveType == PathPoint.MoveType.Lerp) {
-				transform.position = Vector3.Lerp (transform.position, m_CurrentPoint.Current.transform.position, speed);
-			} else if (m_CurrentPoint.Current.moveType == PathPoint.MoveType.SmoothDamp) {
-				transform.position = Vector3.SmoothDamp (transform.position, m_CurrentPoint.Current.transform.position, ref m_SmoothVelocity, m_CurrentPoint.Current.smoothTime);
-			} else if (m_CurrentPoint.Current.moveType == PathPoint.MoveType.Acceleration) {
+			MoveType_MoveTowards(speed);
+			MoveType_Lerp(speed);
+			MoveType_SmoothDamp(speed);
+			MoveType_Acceleration(speed);
+		}
+		public void MoveType_MoveTowards(float speed)
+        {
+			if (m_CurrentPoint.Current.moveType == PathPoint.MoveType.MoveTowards)
+			{
+				transform.position = Vector3.MoveTowards(transform.position, m_CurrentPoint.Current.transform.position, speed);
+				return;
+			}
+		}
+		public void MoveType_Lerp(float speed)
+        {
+			if (m_CurrentPoint.Current.moveType == PathPoint.MoveType.Lerp)
+			{
+				transform.position = Vector3.Lerp(transform.position, m_CurrentPoint.Current.transform.position, speed);
+				return;
+			}
+		}
+		public void MoveType_SmoothDamp(float speed)
+        {
+			if (m_CurrentPoint.Current.moveType == PathPoint.MoveType.SmoothDamp)
+			{
+				transform.position = Vector3.SmoothDamp(transform.position, m_CurrentPoint.Current.transform.position,
+					ref m_SmoothVelocity, m_CurrentPoint.Current.smoothTime);
+				return;
+			}
+		}
+		public void MoveType_Acceleration(float speed)
+        {
+			if (m_CurrentPoint.Current.moveType == PathPoint.MoveType.Acceleration)
+			{
 				Vector3 direction = (m_CurrentPoint.Current.transform.position - transform.position).normalized;
-				transform.position = Vector3.MoveTowards (transform.position, m_CurrentPoint.Current.transform.position, m_OverTimeSpeed);
+				transform.position = Vector3.MoveTowards(transform.position, m_CurrentPoint.Current.transform.position, m_OverTimeSpeed);
 				m_OverTimeSpeed += m_CurrentPoint.Current.acceleration;
-				if (m_OverTimeSpeed > m_CurrentPoint.Current.maxSpeed) {
-					m_OverTimeSpeed = m_CurrentPoint.Current.maxSpeed;
-				}
+				m_OverTimeSpeedMorethanMaxSpeed();
+			}
+		}
+		public void m_OverTimeSpeedMorethanMaxSpeed()
+        {
+			if (m_OverTimeSpeed > m_CurrentPoint.Current.maxSpeed)
+				m_OverTimeSpeed = m_CurrentPoint.Current.maxSpeed;
+		}
+		public void CheckdistanceSquared()
+        {
+			var distanceSquared = (transform.position - m_CurrentPoint.Current.transform.position).sqrMagnitude;
+			distanceSquaredMorethanAream_step(distanceSquared);
+		}
+		public void distanceSquaredMorethanAream_step(float distanceSquared)
+        {
+			if (distanceSquared < m_Step * m_Step)
+			{
+				m_Stopped = true;
+				StopMove();
+			}
+		}
+		public void StopMove()
+        {
+			if (!m_IsMovingNext)
+			{
+				StartCoroutine(MoveNext());
 			}
 		}
 
@@ -161,8 +208,16 @@ namespace RedRunner.Utilities
 		{
 			if (m_FollowDelays && m_PathDefinition.UseGlobalDelay) {
 				delay = m_PathDefinition.GlobalDelay;
-			} else if (!m_FollowDelays) {
+				return;
+			}
+			FollowDelay(delay);
+		}
+		public void FollowDelay(float delay)
+        {
+			if (!m_FollowDelays)
+			{
 				delay = m_Delay;
+				return;
 			}
 		}
 

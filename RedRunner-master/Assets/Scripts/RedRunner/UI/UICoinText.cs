@@ -7,15 +7,15 @@ using System;
 
 namespace RedRunner.UI
 {
-	public class UICoinText : UIText
-	{
-		[SerializeField]
-		protected string m_CoinTextFormat = "x {0}";
+    public class UICoinText : UIText
+    {
+        [SerializeField]
+        protected string m_CoinTextFormat = "x {0}";
 
-		protected override void Awake ()
-		{
-			base.Awake ();
-		}
+        protected override void Awake()
+        {
+            base.Awake();
+        }
 
         protected override void Start()
         {
@@ -27,5 +27,5 @@ namespace RedRunner.UI
             GetComponent<Animator>().SetTrigger("Collect");
             text = string.Format(m_CoinTextFormat, newCoinValue);
         }
-	}
+    }
 }
