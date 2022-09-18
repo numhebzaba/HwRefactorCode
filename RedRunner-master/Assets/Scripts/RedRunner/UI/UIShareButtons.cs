@@ -22,10 +22,12 @@ namespace RedRunner.UI
 
 		public void Toggle ()
 		{
-			if ( m_IsOpen )
+			if ( m_IsOpen)
+            {
 				Setm_IsOpenBooltoFalse();
-			else
-				Setm_IsOpenBooltoTrue();
+				return;
+			}
+			Setm_IsOpenBooltoTrue();
 		}
 		public void Setm_IsOpenBooltoFalse()
         {
