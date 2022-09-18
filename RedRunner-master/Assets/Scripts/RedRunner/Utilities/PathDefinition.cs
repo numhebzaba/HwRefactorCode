@@ -72,9 +72,9 @@ namespace RedRunner.Utilities
 		#endif
 		public void ForLoopSetChildAndPoint()
 		{
-			for ( int i = 0; i < transform.childCount; i++ )
+			for ( int index = 0; index < transform.childCount; index++ )
 				{
-					Transform child = transform.GetChild ( i );
+					Transform child = transform.GetChild ( index );
 					PathPoint point = child.GetComponent<PathPoint> ();
 					IsPointNull(point);
 				}
@@ -109,24 +109,39 @@ namespace RedRunner.Utilities
 		
 		public void IsIndexMorethanZero(int direction,int index)
 		{
-			if ( index <= 0 )
+			DirectionPlus(direction, index);
+			DirectionMinus(direction, index);
+		}
+		public void DirectionPlus(int direction, int index)
+        {
+			if (index <= 0)
+			{
 				direction = 1;
-			else if ( index >= m_Points.Count - 1 )
-				direction = -1;	
+				return;
+			}
+		}
+		public void DirectionMinus(int direction, int index)
+        {
+			if (index >= m_Points.Count - 1)
+			{
+				direction = -1;
+				return;
+			}
 		}
 		public void IsIndexEqual_m_PointsDeleteOneAndZero(int direction,int index)
 		{
-			if ( index == m_Points.Count - 1 && m_ContinueToStart )
+			if ( index == m_Points.Count - 1 && m_ContinueToStart)
+            {
 				index = 0;
-			else
-				index = index + direction;
+				return;
+			}
+			index = index + direction;
 		}
 
 		public void OnDrawGizmos ()
 		{
 			if ( m_Points == null || m_Points.Count < 2 )
 				return;
-
 			ForLoopDrawGizmos();
 		}
 		public void ForLoopDrawGizmos()
