@@ -9,15 +9,15 @@ namespace RedRunner.UI
 	public class UIImageRandom : MonoBehaviour
 	{
 
-		[System.Serializable]
-		public struct RandomImageItem
-		{
-			public Color color;
-			public Sprite sprite;
-		}
+		//[System.Serializable]
+		//public struct RandomImageItem
+		//{
+		//	public Color color;
+		//	public Sprite sprite;
+		//}
 
 		[SerializeField]
-		protected RandomImageItem[] m_RandomItems;
+		protected RandomImageItemClass[] m_RandomItems;
 		[SerializeField]
 		protected Image m_ColorImage;
 		[SerializeField]
