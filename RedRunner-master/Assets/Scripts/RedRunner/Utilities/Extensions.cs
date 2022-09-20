@@ -8,23 +8,23 @@ namespace RedRunner.Utilities
 	public static class Extensions
 	{
 
-		public struct Unit
-		{
-			public string symbol;
-			public float magnitude;
-			public string format;
+		//public struct Unit
+		//{
+		//	public string symbol;
+		//	public float magnitude;
+		//	public string format;
 
-			public Unit ( string symbol, float magnitude, string format )
-			{
-				this.symbol = symbol;
-				this.magnitude = magnitude;
-				this.format = format;
-			}
-		}
+		//	public Unit ( string symbol, float magnitude, string format )
+		//	{
+		//		this.symbol = symbol;
+		//		this.magnitude = magnitude;
+		//		this.format = format;
+		//	}
+		//}
 
-		public static Unit[] lengthUnits = new Unit[] {
-			new Unit ( "m", 1f, "0" ),
-			new Unit ( "km", 1000f, "00.00" )
+		public static UnitClass.Unit[] lengthUnits = new UnitClass.Unit[] {
+			new UnitClass.Unit ( "m", 1f, "0" ),
+			new UnitClass.Unit ( "km", 1000f, "00.00" )
 		};
 
 		public static float modifier = 0.1f;
@@ -36,7 +36,7 @@ namespace RedRunner.Utilities
 			{
 				return "0 " + lengthUnits [ 0 ].symbol;
 			}
-			Unit unit = lengthUnits [ 0 ];
+			UnitClass.Unit unit = lengthUnits [ 0 ];
 			for ( int i = 0; i < lengthUnits.Length; i++ )
 			{
 				if ( value > lengthUnits [ i ].magnitude )
