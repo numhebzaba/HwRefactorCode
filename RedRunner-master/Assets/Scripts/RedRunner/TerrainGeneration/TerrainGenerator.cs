@@ -7,7 +7,7 @@ using RedRunner.Characters;
 namespace RedRunner.TerrainGeneration
 {
 
-	public abstract class TerrainGenerator : MonoBehaviour
+	public class TerrainGenerator : TerrainGenerationVariables
 	{
 
 		private static TerrainGenerator m_Singleton;
@@ -19,30 +19,6 @@ namespace RedRunner.TerrainGeneration
 				return m_Singleton;
 			}
 		}
-
-		protected Dictionary<Vector3, Block> m_Blocks;
-		protected Dictionary<Vector3, BackgroundBlock> m_BackgroundBlocks;
-		protected BackgroundLayer[] m_BackgroundLayers;
-		protected float m_PreviousX;
-		protected float m_CurrentX;
-		protected float m_FathestBackgroundX;
-		[SerializeField]
-		protected TerrainGenerationSettings m_Settings;
-		protected int m_GeneratedStartBlocksCount;
-		protected int m_GeneratedMiddleBlocksCount;
-		protected int m_GeneratedEndBlocksCount;
-		[SerializeField]
-		protected float m_DestroyRange = 100f;
-		[SerializeField]
-		protected float m_GenerateRange = 100f;
-		[SerializeField]
-		protected float m_BackgroundGenerateRange = 200f;
-		[SerializeField]
-		protected Character m_Character;
-		protected Block m_LastBlock;
-		protected BackgroundBlock m_LastBackgroundBlock;
-		protected float m_RemoveTime = 0f;
-		protected bool m_Reset = false;
 
 		public float PreviousX
 		{
@@ -106,9 +82,14 @@ namespace RedRunner.TerrainGeneration
 				m_BackgroundLayers [ i ].Reset ();
 			}
 
+			SetBlockToZero();
+		}
+
+		protected void SetBlockToZero()
+        {
 			m_FathestBackgroundX = 0f;
-			m_Blocks.Clear ();
-			m_BackgroundBlocks.Clear ();
+			m_Blocks.Clear();
+			m_BackgroundBlocks.Clear();
 			m_GeneratedStartBlocksCount = 0;
 			m_GeneratedMiddleBlocksCount = 0;
 			m_GeneratedEndBlocksCount = 0;
@@ -126,6 +107,7 @@ namespace RedRunner.TerrainGeneration
 			{
 				return;
 			}
+			
 			if ( m_RemoveTime < Time.time )
 			{
 				m_RemoveTime = Time.time + 5f;
@@ -154,32 +136,48 @@ namespace RedRunner.TerrainGeneration
 				}
 			}
 
-			for ( int i = 0; i < m_BackgroundLayers.Length; i++ )
+			GenerateBackground();
+		}
+
+		public void GenerateBackground()
+        {
+			for (int i = 0; i < m_BackgroundLayers.Length; i++)
 			{
-				int random = Random.Range ( 0, 2 );
+				int random = Random.Range(0, 2);
 				bool generate = random == 1 ? true : false;
-				if ( !generate )
+				if (!generate)
 				{
 					continue;
 				}
-				Vector3 current = new Vector3 ( m_BackgroundLayers [ i ].CurrentX, 0f, 0f );
-				BackgroundBlock block = ( BackgroundBlock )ChooseFrom ( m_BackgroundLayers [ i ].Blocks );
+				Vector3 current = new Vector3(m_BackgroundLayers[i].CurrentX, 0f, 0f);
+				BackgroundBlock block = (BackgroundBlock)ChooseFrom(m_BackgroundLayers[i].Blocks);
 				float newX = 0f;
 
-				if ( m_BackgroundLayers [ i ].LastBlock != null )
-				{
-					newX = m_BackgroundLayers [ i ].CurrentX + m_BackgroundLayers [ i ].LastBlock.Width;
-				}
-				else
-				{
-					newX = 0f;
-				}
-
-				if ( block != null && ( m_BackgroundLayers [ i ].LastBlock == null || newX < m_Character.transform.position.x + m_BackgroundGenerateRange ) )
-				{
-					CreateBackgroundBlock ( block, current, m_BackgroundLayers [ i ], i );
-				}
+				CheckBackgroundLastBlock();
 			}
+		}
+
+		public void CheckBackgroundLastBlock()
+        {
+			if (m_BackgroundLayers[i].LastBlock != null)
+			{
+				newX = m_BackgroundLayers[i].CurrentX + m_BackgroundLayers[i].LastBlock.Width;
+			}
+			BackgroundLastBlockIsNull();
+
+			if (block != null && (m_BackgroundLayers[i].LastBlock == null || newX < m_Character.transform.position.x + m_BackgroundGenerateRange))
+			{
+				CreateBackgroundBlock(block, current, m_BackgroundLayers[i], i);
+			}
+		}
+
+		public void BackgroundLastBlockIsNull()
+        {
+			if (m_BackgroundLayers[i].LastBlock == null)
+            {
+				newX = 0f;
+			}
+
 		}
 
 		public void GenerateBlockFromStart()
@@ -189,12 +187,22 @@ namespace RedRunner.TerrainGeneration
 				isStart = true;
 				block = ChooseFrom(m_Settings.StartBlocks);
 			}
-			else if (m_GeneratedMiddleBlocksCount < m_Settings.MiddleBlocksCount || m_Settings.MiddleBlocksCount <= 0)
+			GenerateMiddleBlockFromStart();
+			GenerateEndBlockFromStart();
+		}
+		
+		public void GenerateMiddleBlockFromStart()
+        {
+			if (m_GeneratedMiddleBlocksCount < m_Settings.MiddleBlocksCount || m_Settings.MiddleBlocksCount <= 0)
 			{
 				isMiddle = true;
 				block = ChooseFrom(m_Settings.MiddleBlocks);
 			}
-			else if (m_GeneratedEndBlocksCount < m_Settings.EndBlocksCount || m_Settings.EndBlocksCount <= 0)
+		}
+
+		public void GenerateEndBlockFromStart()
+        {
+			if (m_GeneratedEndBlocksCount < m_Settings.EndBlocksCount || m_Settings.EndBlocksCount <= 0)
 			{
 				isEnd = true;
 				block = ChooseFrom(m_Settings.EndBlocks);
@@ -250,20 +258,25 @@ namespace RedRunner.TerrainGeneration
 			}
 			List<BackgroundBlock> backgroundBlocksToRemove = new List<BackgroundBlock> ();
 
-			foreach ( KeyValuePair<Vector3, BackgroundBlock> block in m_BackgroundBlocks )
+			RemoveBackground();
+		}
+
+		public void RemoveBackground()
+        {
+			foreach (KeyValuePair<Vector3, BackgroundBlock> block in m_BackgroundBlocks)
 			{
-				if ( block.Value.transform.position.x - m_FathestBackgroundX > m_DestroyRange )
+				if (block.Value.transform.position.x - m_FathestBackgroundX > m_DestroyRange)
 				{
-					backgroundBlocksToRemove.Add ( block.Value );
+					backgroundBlocksToRemove.Add(block.Value);
 				}
 			}
-			for ( int i = 0; i < blocksToRemove.Count; i++ )
+			for (int i = 0; i < blocksToRemove.Count; i++)
 			{
-				RemoveBlock ( blocksToRemove [ i ] );
+				RemoveBlock(blocksToRemove[i]);
 			}
-			for ( int i = 0; i < backgroundBlocksToRemove.Count; i++ )
+			for (int i = 0; i < backgroundBlocksToRemove.Count; i++)
 			{
-				RemoveBackgroundBlock ( backgroundBlocksToRemove [ i ] );
+				RemoveBackgroundBlock(backgroundBlocksToRemove[i]);
 			}
 		}
 
@@ -314,14 +327,19 @@ namespace RedRunner.TerrainGeneration
 			{
 				return false;
 			}
-			blockPrefab.PreGenerate ( this );
-			Block block = Instantiate<Block> ( blockPrefab, position, Quaternion.identity );
+			SetBlock();
+			return true;
+		}
+
+		public void SetBlock()
+        {
+			blockPrefab.PreGenerate(this);
+			Block block = Instantiate<Block>(blockPrefab, position, Quaternion.identity);
 			m_PreviousX = m_CurrentX;
 			m_CurrentX += block.Width;
-			m_Blocks.Add ( position, block );
-			blockPrefab.PostGenerate ( this );
+			m_Blocks.Add(position, block);
+			blockPrefab.PostGenerate(this);
 			m_LastBlock = block;
-			return true;
 		}
 
 		public virtual bool CreateBackgroundBlock ( BackgroundBlock blockPrefab, Vector3 position, BackgroundLayer layer, int layerIndex )
@@ -330,22 +348,27 @@ namespace RedRunner.TerrainGeneration
 			{
 				return false;
 			}
-			blockPrefab.PreGenerate ( this );
-			position.z = blockPrefab.transform.position.z;
-			position.y = blockPrefab.transform.position.y;
-			BackgroundBlock block = Instantiate<BackgroundBlock> ( blockPrefab, position, Quaternion.identity );
-			float width = Random.Range ( block.MinWidth, block.MaxWidth );
-			m_BackgroundLayers [ layerIndex ].PreviousX = m_BackgroundLayers [ layerIndex ].CurrentX;
-			m_BackgroundLayers [ layerIndex ].CurrentX += width;
-			block.Width = width;
-			m_BackgroundLayers [ layerIndex ].LastBlock = block;
-			m_BackgroundBlocks.Add ( position, block );
-			blockPrefab.PostGenerate ( this );
+			SetBackgroundBlock();
 			if ( m_BackgroundLayers [ layerIndex ].CurrentX > m_FathestBackgroundX )
 			{
 				m_FathestBackgroundX = m_BackgroundLayers [ layerIndex ].CurrentX;
 			}
 			return true;
+		}
+
+		public void SetBackgroundBlock()
+        {
+			blockPrefab.PreGenerate(this);
+			position.z = blockPrefab.transform.position.z;
+			position.y = blockPrefab.transform.position.y;
+			BackgroundBlock block = Instantiate<BackgroundBlock>(blockPrefab, position, Quaternion.identity);
+			float width = Random.Range(block.MinWidth, block.MaxWidth);
+			m_BackgroundLayers[layerIndex].PreviousX = m_BackgroundLayers[layerIndex].CurrentX;
+			m_BackgroundLayers[layerIndex].CurrentX += width;
+			block.Width = width;
+			m_BackgroundLayers[layerIndex].LastBlock = block;
+			m_BackgroundBlocks.Add(position, block);
+			blockPrefab.PostGenerate(this);
 		}
 
 		public Block GetCharacterBlock ()
