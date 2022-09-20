@@ -6,7 +6,6 @@ using RedRunner.Characters;
 
 namespace RedRunner.Collectables
 {
-
 	public class Chest : Collectable
 	{
 		public override Animator Animator {

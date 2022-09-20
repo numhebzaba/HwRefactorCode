@@ -6,30 +6,8 @@ using RedRunner.Characters;
 
 namespace RedRunner.Enemies
 {
-
-	public class Eye : MonoBehaviour
+	public class Eye : EyesVariables
 	{
-
-		[SerializeField]
-		protected float m_Radius = 1f;
-		[SerializeField]
-		protected Transform m_Pupil;
-		[SerializeField]
-		protected Transform m_Eyelid;
-		[SerializeField]
-		protected float m_MaximumDistance = 5f;
-		[SerializeField]
-		protected Character m_LatestCharacter;
-		[SerializeField]
-		protected Vector3 m_InitialPosition;
-		[SerializeField]
-		protected float m_Speed = 0.01f;
-		[SerializeField]
-		protected float m_DeadSpeed = 0.005f;
-		[SerializeField]
-		protected Vector3 m_DeadPosition;
-		protected Vector3 m_PupilDestination;
-
 		public virtual float Radius {
 			get {
 				return m_Radius;
@@ -113,15 +91,19 @@ namespace RedRunner.Enemies
 				distanceToTarget = Vector3.ClampMagnitude(m_DeadPosition, m_Radius);
 				Vector3 finalPupilPosition = transform.position + distanceToTarget;
 				m_PupilDestination = finalPupilPosition;
+				m_Pupil.position = Vector3.MoveTowards(m_Pupil.position, m_PupilDestination, speed);
+				break;
 			}
-			else
-			{
-				float distance = Vector3.Distance(m_LatestCharacter.transform.position, transform.parent.position);
-				CheckDistance();
+			IfNotDead();
+		}
 
-				Vector3 finalPupilPosition = transform.position + distanceToTarget;
-				m_PupilDestination = finalPupilPosition;
-			}
+		protected void IfNotDead()
+        {
+			float distance = Vector3.Distance(m_LatestCharacter.transform.position, transform.parent.position);
+			CheckDistance();
+
+			Vector3 finalPupilPosition = transform.position + distanceToTarget;
+			m_PupilDestination = finalPupilPosition;
 			m_Pupil.position = Vector3.MoveTowards(m_Pupil.position, m_PupilDestination, speed);
 		}
 
@@ -130,11 +112,14 @@ namespace RedRunner.Enemies
 			if (distance <= m_MaximumDistance)
 			{
 				distanceToTarget = Vector3.ClampMagnitude(distanceToTarget, m_Radius);
+				break;
 			}
-			else
-			{
-				distanceToTarget = Vector3.ClampMagnitude(m_InitialPosition, m_Radius);
-			}
+			DistanceFurtherThanMaxDistance();
+		}
+
+		protected void DistanceFurtherThanMaxDistance()
+        {
+			distanceToTarget = Vector3.ClampMagnitude(m_InitialPosition, m_Radius);
 		}
 
 	}
