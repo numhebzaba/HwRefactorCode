@@ -31,9 +31,15 @@ namespace RedRunner.Enemies
 
 				CheckDistanceBetween();
 
-				if (isTop) {
-					Kill (character);
-				}
+				CheckIfTop();
+			}
+		}
+
+		void CheckIfTop()
+        {
+			if (isTop)
+			{
+				Kill(character);
 			}
 		}
 
@@ -50,10 +56,6 @@ namespace RedRunner.Enemies
 			if (!isTop)
 			{
 				isTop = collision2D.contacts[i].normal.y < -0.7f && collision2D.contacts[i].normal.y >= -1f;
-			}
-			else
-			{
-				break;
 			}
 		}
 

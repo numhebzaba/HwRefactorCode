@@ -41,12 +41,19 @@ namespace RedRunner.Enemies
 		void Update ()
 		{
 			Vector3 rotation = targetRotation.rotation.eulerAngles;
-			if (!m_RotateClockwise) {
+			if (!m_RotateClockwise)
+			{
 				rotation.z += m_Speed;
-			} else {
-				rotation.z -= m_Speed;
+				targetRotation.rotation = Quaternion.Euler(rotation);
+				break;
 			}
-			targetRotation.rotation = Quaternion.Euler (rotation);
+			IfRotateCCW();
+		}
+
+		void IfRotateCCW()
+        {
+			rotation.z -= m_Speed;
+			targetRotation.rotation = Quaternion.Euler(rotation);
 		}
 
 		void OnCollisionEnter2D (Collision2D collision2D)
@@ -79,7 +86,8 @@ namespace RedRunner.Enemies
 			{
 				m_AudioSource.clip = m_SawingSound;
 			}
-			else if (!m_AudioSource.isPlaying)
+
+			if (!m_AudioSource.isPlaying)
 			{
 				PlaySound();
 			}
