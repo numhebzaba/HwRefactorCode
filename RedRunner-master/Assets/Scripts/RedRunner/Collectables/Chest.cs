@@ -9,40 +9,6 @@ namespace RedRunner.Collectables
 
 	public class Chest : Collectable
 	{
-
-		[SerializeField]
-		protected Animator m_Animator;
-		[SerializeField]
-		protected Collider2D m_Collider2D;
-		[SerializeField]
-		protected SpriteRenderer m_SpriteRenderer;
-		[SerializeField]
-		protected bool m_UseOnTriggerEnter2D = true;
-		[SerializeField]
-		protected int m_MinimumCoins = 5;
-		[SerializeField]
-		protected int m_MaximumCoins = 10;
-		[SerializeField]
-		protected CoinRigidbody2D m_CoinRigidbody2D;
-		[SerializeField]
-		protected Transform m_SpawnPoint;
-		[SerializeField]
-		protected ParticleSystem m_ParticleSystem;
-		[SerializeField]
-		[Range (-100f, 100f)]
-		protected float m_RandomForceYMinimum = -10f;
-		[SerializeField]
-		[Range (-100f, 100f)]
-		protected float m_RandomForceYMaximum = 10f;
-		[SerializeField]
-		[Range (-100f, 100f)]
-		protected float m_RandomForceXMinimum = -10f;
-		[SerializeField]
-		[Range (-100f, 100f)]
-		protected float m_RandomForceXMaximum = 10f;
-
-		protected Character m_CurrentCharacter;
-
 		public override Animator Animator {
 			get {
 				return m_Animator;
