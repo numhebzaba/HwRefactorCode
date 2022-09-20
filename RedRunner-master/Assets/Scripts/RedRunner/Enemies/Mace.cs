@@ -10,20 +10,6 @@ namespace RedRunner.Enemies
 
 	public class Mace : Enemy
 	{
-
-		[SerializeField]
-		protected Collider2D m_Collider2D;
-		[SerializeField]
-		protected Animator m_Animator;
-		[SerializeField]
-		protected PathFollower m_PathFollower;
-		[SerializeField]
-		protected float m_MaulSpeed = 0.5f;
-		[SerializeField]
-		protected float m_MaulScale = 0.8f;
-		[SerializeField]
-		protected ParticleSystem m_ParticleSystem;
-
 		public override Collider2D Collider2D {
 			get {
 				return m_Collider2D;
@@ -51,18 +37,23 @@ namespace RedRunner.Enemies
 			Vector2 position = collision2D.contacts [0].point;
 			Character character = collision2D.collider.GetComponent<Character> ();
 			bool pressable = false;
+			HowMuchToPress();
 
-			for (int i = 0; i < collision2D.contacts.Length; i++) 
+			IfAlive();
+//			Camera.main.GetComponent<CameraControl> ().Shake (3f, 30, 300f);
+		}
+
+		void HowMuchToPress()
+        {
+			for (int i = 0; i < collision2D.contacts.Length; i++)
 			{
 				Pressable();
 			}
 
-			if (pressable && character == null && !collision2D.collider.CompareTag ("Player")) {
-				Slam (position);
+			if (pressable && character == null && !collision2D.collider.CompareTag("Player"))
+			{
+				Slam(position);
 			}
-
-			IfAlive();
-//			Camera.main.GetComponent<CameraControl> ().Shake (3f, 30, 300f);
 		}
 
 		public void IfAlive()
@@ -88,10 +79,6 @@ namespace RedRunner.Enemies
 				(collision2D.contacts[i].normal.y <= -0.8f && collision2D.contacts[i].normal.y >= -1f && m_PathFollower.Velocity.y < m_MaulSpeed) ||
 				(collision2D.contacts[i].normal.x >= 0.8f && collision2D.contacts[i].normal.x <= 1f && m_PathFollower.Velocity.x < m_MaulSpeed) ||
 				(collision2D.contacts[i].normal.x <= -0.8f && collision2D.contacts[i].normal.x >= -1f && m_PathFollower.Velocity.x > m_MaulSpeed);
-			}
-			else
-			{
-				break;
 			}
 		}
 
