@@ -25,12 +25,16 @@ namespace RedRunner.UI
 
 		protected virtual void Start ()
 		{
-			if ( m_RandomItems.Length > 0 )
+			if (Ism_RandomItemsLengthMorethan_0())
 			{
 				int index = Random.Range ( 0, m_RandomItems.Length );
 				m_PatternImage.sprite = m_RandomItems [ index ].sprite;
 				SetnewColorValue(index);
 			}
+		}
+		bool Ism_RandomItemsLengthMorethan_0()
+        {
+			return m_RandomItems.Length > 0;
 		}
 		public void SetnewColorValue(int index)
         {

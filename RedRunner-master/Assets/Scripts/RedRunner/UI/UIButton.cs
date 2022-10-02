@@ -11,10 +11,15 @@ namespace RedRunner.UI
 
 		public override void OnPointerDown (UnityEngine.EventSystems.PointerEventData eventData)
 		{
-			if (IsActive () && IsInteractable ()) {
+			if (IsFunctionActiveAndFunctionIsIntereactableSameValue()) {
 				AudioManager.Singleton.PlayClickSound ();
 			}
 			base.OnPointerDown (eventData);
+		}
+		public bool IsFunctionActiveAndFunctionIsIntereactableSameValue()
+        {
+			return IsActive() && IsInteractable();
+
 		}
 
 	}

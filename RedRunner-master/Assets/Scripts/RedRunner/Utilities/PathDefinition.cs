@@ -12,11 +12,11 @@ namespace RedRunner.Utilities
 		[SerializeField]
 		protected List<PathPoint> m_Points;
 		[SerializeField]
-		protected bool m_UseGlobalDelay = false;
+		protected bool Ism_UseGlobalDelay = false;
 		[SerializeField]
 		protected float m_GlobalDelay = 0f;
 		[SerializeField]
-		protected bool m_ContinueToStart = false;
+		protected bool Ism_ContinueToStart = false;
 
 		protected int m_CurrentPointIndex = 0;
 
@@ -28,7 +28,7 @@ namespace RedRunner.Utilities
 
 		public virtual bool UseGlobalDelay {
 			get {
-				return m_UseGlobalDelay;
+				return Ism_UseGlobalDelay;
 			}
 		}
 
@@ -40,7 +40,7 @@ namespace RedRunner.Utilities
 
 		public virtual bool ContinueToStart {
 			get {
-				return m_ContinueToStart;
+				return Ism_ContinueToStart;
 			}
 		}
 
@@ -53,89 +53,91 @@ namespace RedRunner.Utilities
 		#if UNITY_EDITOR
 		void OnEnable ()
 		{
-			if ( m_Points == null )
-			{
-				m_Points = new List<PathPoint> ();
-			}
+			if (m_Points != null)
+				return;
+			m_Points = new List<PathPoint>();
 		}
 		#endif
 
 		#if UNITY_EDITOR
 		void Update ()
 		{
-			if ( transform.childCount != m_Points.Count )
-			{
-				m_Points.Clear ();
-				ForLoopSetChildAndPoint();
-			}
+			if (transform.childCount != m_Points.Count)
+				return;
+			m_Points.Clear();
+			ForLoopSetChildAndPoint();
 		}
 		#endif
 		public void ForLoopSetChildAndPoint()
 		{
 			for ( int index = 0; index < transform.childCount; index++ )
-				{
-					Transform child = transform.GetChild ( index );
-					PathPoint point = child.GetComponent<PathPoint> ();
-					IsPointNull(point);
-				}
+			{
+				Transform child = transform.GetChild ( index );
+				PathPoint point = child.GetComponent<PathPoint> ();
+				TryPointNull(point);
+			}
 		}
-		public void IsPointNull(PathPoint point)
+		public void TryPointNull(PathPoint point)
 		{
-			if ( point != null )
-				m_Points.Add ( point );
+			if (point == null)
+				return;
+			m_Points.Add ( point );
 		}
-		public IEnumerator<PathPoint> GetPathEnumerator ()
+		public IEnumerator<PathPoint> GetPathEnumeratorRoutine ()
 		{
 			// Exit when points count is smaller one
-			if ( m_Points == null || m_Points.Count < 1 )
+			if (IsOneOfThisTrue_m_PointsNull_m_PointsCountLessthan1())
 				yield break;
-			var direction = 1;
-			var index = 0;
-			m_CurrentPointIndex = index;
-			whileLoopm_CurrentPointIndex(direction,index);
+			var DirectionData = new DirectionData(-1,0);
+			m_CurrentPointIndex = DirectionData.index;
+			whileLoopm_CurrentPointIndexRoutine(DirectionData);
 		}
-		public IEnumerable whileLoopm_CurrentPointIndex(int direction,int index)
+		bool IsOneOfThisTrue_m_PointsNull_m_PointsCountLessthan1()
+        {
+			return (m_Points == null || m_Points.Count < 1);
+		}
+		public IEnumerable whileLoopm_CurrentPointIndexRoutine(DirectionData DirectionData)
 		{
 			while ( true )
 			{
-				yield return m_Points [ index ];
+				yield return m_Points [DirectionData.index];
 				if ( m_Points.Count == 1)
 					continue;
-				IsIndexMorethanZero(direction,index);
-				IsIndexEqual_m_PointsDeleteOneAndZero(direction,index);
-				m_CurrentPointIndex = index;
+				IsIndexMorethanZero(DirectionData);
+				IsIndexEqual_m_PointsDeleteOneAndZero(DirectionData);
+				m_CurrentPointIndex = DirectionData.index;
 			}
 		}
 		
-		public void IsIndexMorethanZero(int direction,int index)
+		public void IsIndexMorethanZero(DirectionData DirectionData)
 		{
-			DirectionPlus(direction, index);
-			DirectionMinus(direction, index);
+			DirectionPlus(DirectionData);
+			DirectionMinus(DirectionData);
 		}
-		public void DirectionPlus(int direction, int index)
+		public void DirectionPlus(DirectionData DirectionData)
         {
-			if (index <= 0)
+			if (DirectionData.index <= 0)
 			{
-				direction = 1;
+				DirectionData.direction = 1;
 				return;
 			}
 		}
-		public void DirectionMinus(int direction, int index)
+		public void DirectionMinus(DirectionData DirectionData)
         {
-			if (index >= m_Points.Count - 1)
+			if (DirectionData.index >= m_Points.Count - 1)
 			{
-				direction = -1;
+				DirectionData.direction = -1;
 				return;
 			}
 		}
-		public void IsIndexEqual_m_PointsDeleteOneAndZero(int direction,int index)
+		public void IsIndexEqual_m_PointsDeleteOneAndZero(DirectionData DirectionData)
 		{
-			if ( index == m_Points.Count - 1 && m_ContinueToStart)
+			if (DirectionData.index == m_Points.Count - 1 && Ism_ContinueToStart)
             {
-				index = 0;
+				DirectionData.index = 0;
 				return;
 			}
-			index = index + direction;
+			DirectionData.index = DirectionData.index + DirectionData.direction;
 		}
 
 		public void OnDrawGizmos ()

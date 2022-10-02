@@ -11,7 +11,7 @@ namespace RedRunner.UI
 	public class UIScoreText : Text
 	{
 
-		protected bool m_Collected = false;
+		protected bool Ism_Collected = false;
 
 		protected override void Awake ()
 		{
@@ -22,18 +22,22 @@ namespace RedRunner.UI
 
 		void GameManager_OnReset ()
 		{
-			m_Collected = false;
+			Ism_Collected = false;
 		}
 
-		void GameManager_OnScoreChanged ( float newScore, float highScore, float lastScore )
+		void GameManager_OnScoreChanged ( ScoreData scoreData )
 		{
-			text = newScore.ToLength ();
-			if ( newScore > highScore && !m_Collected )
+			text = scoreData.newScore.ToLength ();
+			if (IsNewScoreMorethanHighScoreAndm_CollectedIsFalse(scoreData))
 				Setm_CollectedBoolAndSetTriggerValue();
+		}
+		public bool IsNewScoreMorethanHighScoreAndm_CollectedIsFalse(ScoreData scoreData)
+		{
+			return (scoreData.newScore > scoreData.highScore && !Ism_Collected);
 		}
 		public void Setm_CollectedBoolAndSetTriggerValue()
         {
-			m_Collected = true;
+			Ism_Collected = true;
 			GetComponent<Animator>().SetTrigger("Collect");
 		}
 

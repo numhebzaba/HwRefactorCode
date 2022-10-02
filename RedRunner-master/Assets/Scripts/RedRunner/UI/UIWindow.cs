@@ -30,7 +30,7 @@ namespace RedRunner.UI
 		[SerializeField]
 		protected CloseEvent m_OnClose;
 		[SerializeField]
-		protected bool m_Open = false;
+		protected bool Ism_Open = false;
 
 		public void Open ()
 		{
@@ -74,9 +74,9 @@ namespace RedRunner.UI
 
 		public void OpenChanged ( bool isOpen )
 		{
-			m_Open = isOpen;
-			m_CanvasGroup.interactable = m_Open;
-			m_CanvasGroup.blocksRaycasts = m_Open;
+			Ism_Open = isOpen;
+			m_CanvasGroup.interactable = Ism_Open;
+			m_CanvasGroup.blocksRaycasts = Ism_Open;
 		}
 
 		[System.Serializable]

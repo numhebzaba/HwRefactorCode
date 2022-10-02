@@ -21,13 +21,13 @@ namespace RedRunner.Utilities
 		[SerializeField]
 		private float m_RayDistance = 0.5f;
 
-		public bool IsGrounded { get { return m_IsGrounded; } }
+		public bool IsGrounded { get { return Ism_IsGrounded; } }
 
-		private bool m_IsGrounded = false;
+		private bool Ism_IsGrounded = false;
 
 		void Awake ()
 		{
-			m_IsGrounded = false;
+			Ism_IsGrounded = false;
 		}
 
 		void Update ()
@@ -35,20 +35,22 @@ namespace RedRunner.Utilities
 			Vector2 left = new Vector2 (m_Collider2D.bounds.max.x, m_Collider2D.bounds.center.y);
 			Vector2 center = new Vector2 (m_Collider2D.bounds.center.x, m_Collider2D.bounds.center.y);
 			Vector2 right = new Vector2 (m_Collider2D.bounds.min.x, m_Collider2D.bounds.center.y);
-			DebugAllRaycast(left, center, right);
+			bool grounded1 = false, grounded2 = false, grounded3 = false;
+			var GroundCheckData = new GroundCheckData(left, center, right, grounded1, grounded2, grounded3);
+			DebugAllRaycast(GroundCheckData);
 		}
-		public void DebugAllRaycast(Vector2 left,Vector2 center,Vector2 right)
+		public void DebugAllRaycast(GroundCheckData GroundCheckData)
 		{
-			bool grounded1 = false,grounded2 = false, grounded3 = false;
-			DebugEachRaycast(left,center,right,grounded1,grounded2,grounded3);
-			bool grounded = grounded1 || grounded2 || grounded3;
+			
+			DebugEachRaycast(GroundCheckData);
+			bool grounded = GroundCheckData.grounded1 || GroundCheckData.grounded2 || GroundCheckData.grounded3;
 			checkGrounded(grounded);
 		}
-		public void DebugEachRaycast(Vector2 left,Vector2 center,Vector2 right,bool grounded1,bool grounded2,bool grounded3)
+		public void DebugEachRaycast(GroundCheckData GroundCheckData)
 		{
-			DebugOneRaycast(left,grounded1);
-			DebugOneRaycast(center,grounded2);
-			DebugOneRaycast(right,grounded3);
+			DebugOneRaycast(GroundCheckData.left, GroundCheckData.grounded1);
+			DebugOneRaycast(GroundCheckData.center, GroundCheckData.grounded2);
+			DebugOneRaycast(GroundCheckData.right, GroundCheckData.grounded3);
 		}
 		public void DebugOneRaycast(Vector2 direction,bool groundedIndex)
 		{
@@ -58,11 +60,11 @@ namespace RedRunner.Utilities
 		}
 		public void checkGrounded(bool grounded)
 		{
-			if (grounded && !m_IsGrounded) {
+			if (grounded && !Ism_IsGrounded) {
 				if (OnGrounded != null)
 					OnGrounded ();
 			}
-			m_IsGrounded = grounded;
+			Ism_IsGrounded = grounded;
 		}
 
 	}

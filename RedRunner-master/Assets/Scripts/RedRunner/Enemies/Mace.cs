@@ -43,7 +43,7 @@ namespace RedRunner.Enemies
 		void Reset ()
 		{
 			m_Animator.SetTrigger ("Reset");
-			m_PathFollower.Stopped = false;
+			m_PathFollower.IsStopped = false;
 		}
 
 		void OnCollisionEnter2D (Collision2D collision2D)
@@ -85,7 +85,7 @@ namespace RedRunner.Enemies
 
 		public override void Kill (Character target)
 		{
-			m_PathFollower.Stopped = true;
+			m_PathFollower.IsStopped = true;
 			target.Die (true);
 			m_Animator.SetTrigger ("Smile");
 			AudioManager.Singleton.PlaySpikeSound (transform.position);

@@ -15,34 +15,34 @@ namespace RedRunner.Utilities
 		[SerializeField]
 		protected float m_Step = 0.1f;
 		[SerializeField]
-		protected bool m_FollowSpeeds = true;
+		protected bool Ism_FollowSpeeds = true;
 		[SerializeField]
 		protected float m_Speed = 1f;
 		[SerializeField]
-		protected bool m_FollowDelays = true;
+		protected bool Ism_FollowDelays = true;
 		[SerializeField]
 		protected float m_Delay = 0f;
 		[SerializeField]
-		protected bool m_Smart = false;
+		protected bool Ism_Smart = false;
 		[SerializeField]
 		protected Vector3 m_RangeSize = new Vector3 (4f, 4f, 4f);
 		[SerializeField]
 		protected Vector3 m_RangeOffset = new Vector3 (0f, 0f, 0f);
 
-		protected bool m_Stopped = false;
+		protected bool Ism_Stopped = false;
 		protected IEnumerator<PathPoint> m_CurrentPoint;
-		protected bool m_IsMovingNext = false;
+		protected bool Ism_MovingNext = false;
 		protected Vector3 m_LastPosition;
 		protected Vector3 m_Velocity;
 		protected Vector3 m_SmoothVelocity;
 		protected float m_OverTimeSpeed = 0f;
 
-		public virtual bool Stopped {
+		public virtual bool IsStopped {
 			get {
-				return m_Stopped;
+				return Ism_Stopped;
 			}
 			set {
-				m_Stopped = value;
+				Ism_Stopped = value;
 			}
 		}
 
@@ -54,36 +54,36 @@ namespace RedRunner.Utilities
 
 		void Awake ()
 		{
-			m_Stopped = m_Smart;
+			Ism_Stopped = Ism_Smart;
 		}
 
 		void Start ()
 		{
-			Ism_PathDefinitionNull();
-			setm_CurrentPoint();
-			Ism_CurrentPointNull();
+			TryCheckIsm_PathDefinitionNull();
+			Setm_CurrentPoint();
+			TryCheckIsm_CurrentPointNull();
 			transform.position = m_CurrentPoint.Current.transform.position;
-			StartCoroutine (CalcVelocity ());
+			StartCoroutine (CalcVelocityRoutine ());
 		}
-		public void Ism_PathDefinitionNull()
+		public void TryCheckIsm_PathDefinitionNull()
 		{
 			if (m_PathDefinition == null) {
 				return;
 			}
 		}
-		public void Ism_CurrentPointNull()
+		public void Setm_CurrentPoint()
+		{
+			m_CurrentPoint = m_PathDefinition.GetPathEnumeratorRoutine();
+			m_CurrentPoint.MoveNext();
+		}
+		public void TryCheckIsm_CurrentPointNull()
 		{
 			if (m_CurrentPoint.Current == null)
 				return;
 		}
-		public void setm_CurrentPoint()
-        {
-			m_CurrentPoint = m_PathDefinition.GetPathEnumerator();
-			m_CurrentPoint.MoveNext();
-		}
 		void OnDrawGizmos ()
 		{
-			if (m_Smart) {
+			if (Ism_Smart) {
 				Gizmos.DrawWireCube (transform.position + m_RangeOffset, m_RangeSize);
 			}
 		}
@@ -91,67 +91,83 @@ namespace RedRunner.Utilities
 		void Update ()
 		{
 			Ifm_Smart();
-			if (m_CurrentPoint == null || m_CurrentPoint.Current == null || m_Stopped || !GameManager.Singleton.gameRunning) {
+			if (IsOneOfthisTrue_CurrentPointNull_CurrentPointCurrentNull_Ism_Stopped_SingletonGameRunning()) 
 				return;
-			}
 			float speed = Time.deltaTime * m_CurrentPoint.Current.speed;
-			IfMoveType(speed);
-
-			CheckdistanceSquared();
+			_4MoveType(speed);
+			CheckDistanceSquared();
 		}
 		public void Ifm_Smart()
 		{
-			if (m_Smart) {
+			if (Ism_Smart) {
 				Collider2D[] colliders = Physics2D.OverlapBoxAll (transform.position + m_RangeOffset, m_RangeSize, 0f, LayerMask.GetMask ("Characters"));
 				LoopColliderArrayCharacter(colliders);
 				return;
 			}
-			m_Stopped = false;
+			Ism_Stopped = false;
+		}
+		bool IsOneOfthisTrue_CurrentPointNull_CurrentPointCurrentNull_Ism_Stopped_SingletonGameRunning()
+        {
+			return (m_CurrentPoint == null || m_CurrentPoint.Current == null || Ism_Stopped || !GameManager.Singleton.gameRunning);
+
 		}
 		public void LoopColliderArrayCharacter(Collider2D[] colliders)
         {
 			for (int index = 0; index < colliders.Length; index++)
 			{
 				Character character = colliders[index].GetComponent<Character>();
-				if (character != null)
-					m_Stopped = false;
+				if (character == null)
+					return;
+				Ism_Stopped = false;
 			}
 		}
-		public void IfMoveType(float speed)
+		public void _4MoveType(float speed)
 		{
-			MoveType_MoveTowards(speed);
-			MoveType_Lerp(speed);
-			MoveType_SmoothDamp(speed);
-			MoveType_Acceleration(speed);
+			TryMoveType_MoveTowards(speed);
+			TryMoveType_Lerp(speed);
+			TryMoveType_SmoothDamp(speed);
+			TryMoveType_Acceleration(speed);
 		}
-		public void MoveType_MoveTowards(float speed)
+		public void TryMoveType_MoveTowards(float speed)
         {
-			if (m_CurrentPoint.Current.moveType == PathPoint.MoveType.MoveTowards)
+			if (IsMoveType_MoveTowards())
 			{
 				transform.position = Vector3.MoveTowards(transform.position, m_CurrentPoint.Current.transform.position, speed);
 				return;
 			}
 		}
-		public void MoveType_Lerp(float speed)
+		bool IsMoveType_MoveTowards()
         {
-			if (m_CurrentPoint.Current.moveType == PathPoint.MoveType.Lerp)
+			return m_CurrentPoint.Current.moveType == PathPoint.MoveType.MoveTowards;
+		}
+		public void TryMoveType_Lerp(float speed)
+        {
+			if (IsMoveType_Lerp())
 			{
 				transform.position = Vector3.Lerp(transform.position, m_CurrentPoint.Current.transform.position, speed);
 				return;
 			}
 		}
-		public void MoveType_SmoothDamp(float speed)
+		bool IsMoveType_Lerp()
+		{
+			return m_CurrentPoint.Current.moveType == PathPoint.MoveType.Lerp;
+		}
+		public void TryMoveType_SmoothDamp(float speed)
         {
-			if (m_CurrentPoint.Current.moveType == PathPoint.MoveType.SmoothDamp)
+			if (IsMoveType_SmoothDamp())
 			{
 				transform.position = Vector3.SmoothDamp(transform.position, m_CurrentPoint.Current.transform.position,
 					ref m_SmoothVelocity, m_CurrentPoint.Current.smoothTime);
 				return;
 			}
 		}
-		public void MoveType_Acceleration(float speed)
+		bool IsMoveType_SmoothDamp()
+		{
+			return m_CurrentPoint.Current.moveType == PathPoint.MoveType.SmoothDamp;
+		}
+		public void TryMoveType_Acceleration(float speed)
         {
-			if (m_CurrentPoint.Current.moveType == PathPoint.MoveType.Acceleration)
+			if (IsMoveType_Acceleration())
 			{
 				Vector3 direction = (m_CurrentPoint.Current.transform.position - transform.position).normalized;
 				transform.position = Vector3.MoveTowards(transform.position, m_CurrentPoint.Current.transform.position, m_OverTimeSpeed);
@@ -159,33 +175,36 @@ namespace RedRunner.Utilities
 				m_OverTimeSpeedMorethanMaxSpeed();
 			}
 		}
+		bool IsMoveType_Acceleration()
+		{
+			return m_CurrentPoint.Current.moveType == PathPoint.MoveType.Acceleration;
+		}
 		public void m_OverTimeSpeedMorethanMaxSpeed()
         {
 			if (m_OverTimeSpeed > m_CurrentPoint.Current.maxSpeed)
 				m_OverTimeSpeed = m_CurrentPoint.Current.maxSpeed;
 		}
-		public void CheckdistanceSquared()
+		public void CheckDistanceSquared()
         {
 			var distanceSquared = (transform.position - m_CurrentPoint.Current.transform.position).sqrMagnitude;
-			distanceSquaredMorethanAream_step(distanceSquared);
+			TryDistanceSquaredMorethanAream_step(distanceSquared);
 		}
-		public void distanceSquaredMorethanAream_step(float distanceSquared)
+		public void TryDistanceSquaredMorethanAream_step(float distanceSquared)
         {
 			if (distanceSquared < m_Step * m_Step)
 			{
-				m_Stopped = true;
+				Ism_Stopped = true;
 				StopMove();
 			}
 		}
 		public void StopMove()
         {
-			if (!m_IsMovingNext)
-			{
-				StartCoroutine(MoveNext());
-			}
+			if (Ism_MovingNext)
+				return;
+			StartCoroutine(MoveNextRoutine());
 		}
 
-		IEnumerator CalcVelocity ()
+		IEnumerator CalcVelocityRoutine ()
 		{
 			while (Application.isPlaying) {
 				m_LastPosition = transform.position;
@@ -194,31 +213,33 @@ namespace RedRunner.Utilities
 			}
 		}
 
-		IEnumerator MoveNext ()
+		IEnumerator MoveNextRoutine ()
 		{
-			m_IsMovingNext = true;
+			Ism_MovingNext = true;
 			float delay = m_CurrentPoint.Current.delay;
-			Ism_FollowDelaysEqualUseGlobalDelay(delay);
+			Trym_IsFollowDelaysEqualUseGlobalDelay(delay);
 			yield return new WaitForSeconds (delay);
 			m_OverTimeSpeed = 0f;
 			m_CurrentPoint.MoveNext ();
-			m_IsMovingNext = false;
+			Ism_MovingNext = false;
 		}
-		public void Ism_FollowDelaysEqualUseGlobalDelay(float delay)
+		public void Trym_IsFollowDelaysEqualUseGlobalDelay(float delay)
 		{
-			if (m_FollowDelays && m_PathDefinition.UseGlobalDelay) {
+			if (Is_Ism_FollowDelaysEqualUseGlobalDelay()) {
 				delay = m_PathDefinition.GlobalDelay;
 				return;
 			}
 			FollowDelay(delay);
 		}
+		bool Is_Ism_FollowDelaysEqualUseGlobalDelay()
+        {
+			return Ism_FollowDelays && m_PathDefinition.UseGlobalDelay;
+		}
 		public void FollowDelay(float delay)
         {
-			if (!m_FollowDelays)
-			{
-				delay = m_Delay;
+			if (Ism_FollowDelays)
 				return;
-			}
+			delay = m_Delay;
 		}
 
 	}

@@ -13,7 +13,7 @@ namespace RedRunner.UI
 		protected Animator m_ShareBackground;
 		[SerializeField]
 		protected Animator[] m_ShareButtons;
-		protected bool m_IsOpen = false;
+		protected bool Ism_IsOpen = false;
 
 		void Start ()
 		{
@@ -22,7 +22,7 @@ namespace RedRunner.UI
 
 		public void Toggle ()
 		{
-			if ( m_IsOpen)
+			if ( Ism_IsOpen)
             {
 				Setm_IsOpenBooltoFalse();
 				return;
@@ -31,21 +31,21 @@ namespace RedRunner.UI
 		}
 		public void Setm_IsOpenBooltoFalse()
         {
-			m_IsOpen = false;
+			Ism_IsOpen = false;
 			SetTrigger("Close");
 		}
 		public void Setm_IsOpenBooltoTrue()
         {
-			m_IsOpen = true;
+			Ism_IsOpen = true;
 			SetTrigger("Open");
 		}
 
 		public void SetTrigger ( string trigger )
 		{
 			m_ShareBackground.SetTrigger ( trigger );
-			for ( int i = 0; i < m_ShareButtons.Length; i++ )
+			for ( int index = 0; index < m_ShareButtons.Length; index++ )
 			{
-				m_ShareButtons [ i ].SetTrigger ( trigger );
+				m_ShareButtons [index].SetTrigger ( trigger );
 			}
 		}
 

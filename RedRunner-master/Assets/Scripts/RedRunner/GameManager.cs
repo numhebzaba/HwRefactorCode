@@ -17,7 +17,7 @@ namespace RedRunner
     {
         public delegate void AudioEnabledHandler(bool active);
 
-        public delegate void ScoreHandler(float newScore, float highScore, float lastScore);
+        public delegate void ScoreHandler(ScoreData scoreData);
 
         public delegate void ResetHandler();
 
@@ -46,6 +46,7 @@ namespace RedRunner
         private float m_HighScore = 0f;
         private float m_LastScore = 0f;
         private float m_Score = 0f;
+
 
         private bool m_GameStarted = false;
         private bool m_GameRunning = false;
@@ -134,7 +135,7 @@ namespace RedRunner
         {
             if (isDead)
             {
-                StartCoroutine(DeathCrt());
+                StartCoroutine(DeathCrtRoutine());
             }
             else
             {
@@ -142,8 +143,9 @@ namespace RedRunner
             }
         }
 
-        IEnumerator DeathCrt()
+        IEnumerator DeathCrtRoutine()
         {
+            var scoreData = new ScoreData(m_Score, m_HighScore, m_LastScore);
             m_LastScore = m_Score;
             if (m_Score > m_HighScore)
             {
@@ -151,7 +153,7 @@ namespace RedRunner
             }
             if (OnScoreChanged != null)
             {
-                OnScoreChanged(m_Score, m_HighScore, m_LastScore);
+                OnScoreChanged(scoreData);
             }
 
             yield return new WaitForSecondsRealtime(1.5f);
@@ -172,11 +174,12 @@ namespace RedRunner
         {
             EndGame();
             UIManager.Singleton.Init();
-            StartCoroutine(Load());
+            StartCoroutine(LoadRoutine());
         }
 
         void Update()
         {
+            var scoreData = new ScoreData(m_Score, m_HighScore, m_LastScore);
             if (m_GameRunning)
             {
                 if (m_MainCharacter.transform.position.x > m_StartScoreX && m_MainCharacter.transform.position.x > m_Score)
@@ -184,13 +187,13 @@ namespace RedRunner
                     m_Score = m_MainCharacter.transform.position.x;
                     if (OnScoreChanged != null)
                     {
-                        OnScoreChanged(m_Score, m_HighScore, m_LastScore);
+                        OnScoreChanged(scoreData);
                     }
                 }
             }
         }
 
-        IEnumerator Load()
+        IEnumerator LoadRoutine()
         {
             var startScreen = UIManager.Singleton.UISCREENS.Find(el => el.ScreenInfo == UIScreenInfo.START_SCREEN);
             yield return new WaitForSecondsRealtime(3f);

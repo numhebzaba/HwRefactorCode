@@ -17,9 +17,9 @@ namespace RedRunner.UI
 			base.Awake ();
 		}
 
-		void GameManager_OnScoreChanged ( float newScore, float highScore, float lastScore )
+		void GameManager_OnScoreChanged ( ScoreData scoreData )
 		{
-			text = highScore.ToLength ();
+			text = scoreData.highScore.ToLength ();
 		}
 
 	}

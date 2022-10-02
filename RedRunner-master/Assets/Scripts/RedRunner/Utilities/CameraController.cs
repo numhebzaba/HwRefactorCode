@@ -36,18 +36,18 @@ namespace RedRunner.Utilities
 		private float m_FastMoveSpeed = 10f;
 		[SerializeField]
 		private float m_Speed = 1f;
-		private bool m_FastMove = false;
+		private bool Ism_FastMove = false;
 		private Vector3 m_OldPosition;
 
 		public bool fastMove
 		{
 			get
 			{
-				return m_FastMove;
+				return Ism_FastMove;
 			}
 			set
 			{
-				m_FastMove = value;
+				Ism_FastMove = value;
 			}
 
 		}
@@ -67,60 +67,56 @@ namespace RedRunner.Utilities
 			//if (!m_ShakeControl.IsShaking) {
 			Follow();
 			//}
-			if (transform.position != m_OldPosition)
-			{
-				onCameraTranslateIsNotNull();
-				m_OldPosition = transform.position;
-			}
+			if (transform.position == m_OldPosition)
+				return;
+			TryonCameraTranslateIsNotNull();
+			m_OldPosition = transform.position;
 		}
-		public void onCameraTranslateIsNotNull()
+		public void TryonCameraTranslateIsNotNull()
 		{
-			if (onCameraTranslate != null)
-			{
-				Vector3 delta = m_OldPosition - transform.position;
-				onCameraTranslate(delta);
-			}
+			if (onCameraTranslate == null)
+				return;
+			Vector3 delta = m_OldPosition - transform.position;
+			onCameraTranslate(delta);
 		}
 		public void Follow()
 		{
 			float speed = m_Speed;
 			Ism_FastMoveTrue(speed);
-			Vector3 cameraPosition = transform.position;
-			Vector3 targetPosition = m_Followee.position;
-
-			CheckPosition(cameraPosition, targetPosition, speed);
-
+			Vector3 cameraPosition = transform.position, targetPosition = m_Followee.position;
+			var CameraControllData = new CameraControllData(cameraPosition, targetPosition, speed);
+			CheckPosition(CameraControllData);
 		}
 		public void Ism_FastMoveTrue(float speed)
 		{
-			if (m_FastMove)
+			if (Ism_FastMove)
 				speed = m_FastMoveSpeed;
 		}
-		public void CheckPosition(Vector3 cameraPosition, Vector3 targetPosition, float speed)
+		public void CheckPosition(CameraControllData CameraControllData)
 		{
-			IsTargetPositionX_Morethan_m_MinX(cameraPosition, targetPosition);
-			IsTargetPositionY_Morethan_m_MinY(cameraPosition, targetPosition);
-			transform.position = Vector3.MoveTowards(transform.position, cameraPosition, speed);
-			IsTranformPositionEqualTargetPosition(targetPosition);
+			IsTargetPositionX_Morethan_m_MinX(CameraControllData);
+			IsTargetPositionY_Morethan_m_MinY(CameraControllData);
+			transform.position = Vector3.MoveTowards(transform.position, CameraControllData.cameraPosition, CameraControllData.speed);
+			IsTranformPositionEqualTargetPosition(CameraControllData.targetPosition);
 		}
-		public void IsTargetPositionX_Morethan_m_MinX(Vector3 cameraPosition, Vector3 targetPosition)
+		public void IsTargetPositionX_Morethan_m_MinX(CameraControllData CameraControllData)
 		{
-			if (targetPosition.x - m_Camera.orthographicSize * m_Camera.aspect > m_MinX)
-				cameraPosition.x = targetPosition.x;
+			if (CameraControllData.targetPosition.x - m_Camera.orthographicSize * m_Camera.aspect > m_MinX)
+				CameraControllData.cameraPosition.x = CameraControllData.targetPosition.x;
 			else
-				cameraPosition.x = m_MinX + m_Camera.orthographicSize * m_Camera.aspect;
+				CameraControllData.cameraPosition.x = m_MinX + m_Camera.orthographicSize * m_Camera.aspect;
 		}
-		public void IsTargetPositionY_Morethan_m_MinY(Vector3 cameraPosition, Vector3 targetPosition)
+		public void IsTargetPositionY_Morethan_m_MinY(CameraControllData CameraControllData)
 		{
-			if (targetPosition.y - m_Camera.orthographicSize > m_MinY)
-				cameraPosition.y = targetPosition.y;
+			if (CameraControllData.targetPosition.y - m_Camera.orthographicSize > m_MinY)
+				CameraControllData.cameraPosition.y = CameraControllData.targetPosition.y;
 			else
-				cameraPosition.y = m_MinY + m_Camera.orthographicSize;
+				CameraControllData.cameraPosition.y = m_MinY + m_Camera.orthographicSize;
 		}
 		public void IsTranformPositionEqualTargetPosition(Vector3 targetPosition)
 		{
-			if (transform.position == targetPosition && m_FastMove)
-				m_FastMove = false;
+			if (transform.position == targetPosition && Ism_FastMove)
+				Ism_FastMove = false;
 		}
 	}
 

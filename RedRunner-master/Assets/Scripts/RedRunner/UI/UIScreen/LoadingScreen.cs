@@ -6,9 +6,9 @@ namespace RedRunner.UI
 {
     public class LoadingScreen : UIScreen
     {
-        public override void UpdateScreenStatus(bool open)
+        public override void UpdateScreenStatus(bool Isopen)
         {
-            base.UpdateScreenStatus(open);
+            base.UpdateScreenStatus(Isopen);
         }
     }
 
