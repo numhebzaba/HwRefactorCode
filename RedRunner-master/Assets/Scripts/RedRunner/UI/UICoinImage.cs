@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEngine.UI;
 
 using RedRunner.Collectables;
+using DG.Tweening;
 
 namespace RedRunner.UI
 {
@@ -14,24 +15,30 @@ namespace RedRunner.UI
 		[SerializeField]
 		protected ParticleSystem m_ParticleSystem;
 
-		protected override void Awake ()
+		protected override void Awake()
 		{
-			base.Awake ();
+			base.Awake();
 		}
 
-        protected override void Start()
-        {
-            GameManager.Singleton.m_Coin.AddEventAndFire(Coin_OnCoinCollected, this);
-        }
-
-        void Coin_OnCoinCollected (int coinValue)
+		protected override void Start()
 		{
-			GetComponent<Animator> ().SetTrigger ("Collect");
+			GameManager.Singleton.m_Coin.AddEventAndFire(Coin_OnCoinCollected, this);
 		}
 
-		public virtual void PlayParticleSystem ()
+		void Coin_OnCoinCollected(int coinValue)
 		{
-			m_ParticleSystem.Play ();
+			GetComponent<Animator>().SetTrigger("Collect");
+			DoFadeTween();
+		}
+		void DoFadeTween()
+		{
+			material.DOFade(80, 1);
+			material.DOFade(100, 0.5f);
+		}
+
+		public virtual void PlayParticleSystem()
+		{
+			m_ParticleSystem.Play();
 		}
 	}
 }

@@ -4,6 +4,7 @@ using UnityEngine;
 
 using RedRunner.Collectables;
 using System;
+using DG.Tweening;
 
 namespace RedRunner.UI
 {
@@ -26,6 +27,12 @@ namespace RedRunner.UI
         {
             GetComponent<Animator>().SetTrigger("Collect");
             text = string.Format(m_CoinTextFormat, newCoinValue);
+            DoFadeTween();
+        }
+        void DoFadeTween()
+        {
+            material.DOFade(80, 1);
+            material.DOFade(100, 0.5f);
         }
     }
 }
