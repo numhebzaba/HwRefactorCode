@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEngine.UI;
 
 using RedRunner.Utilities;
+using DG.Tweening;
 
 namespace RedRunner.UI
 {
@@ -20,6 +21,7 @@ namespace RedRunner.UI
 		void GameManager_OnScoreChanged (ScoreData ScoreData)
 		{
 			text = ScoreData.lastScore.ToLength ();
+			material.DOColor(Color.red,1);
 		}
 
 	}
