@@ -6,43 +6,8 @@ using RedRunner.Characters;
 
 namespace RedRunner.Collectables
 {
-
 	public class Chest : Collectable
 	{
-
-		[SerializeField]
-		protected Animator m_Animator;
-		[SerializeField]
-		protected Collider2D m_Collider2D;
-		[SerializeField]
-		protected SpriteRenderer m_SpriteRenderer;
-		[SerializeField]
-		protected bool m_UseOnTriggerEnter2D = true;
-		[SerializeField]
-		protected int m_MinimumCoins = 5;
-		[SerializeField]
-		protected int m_MaximumCoins = 10;
-		[SerializeField]
-		protected CoinRigidbody2D m_CoinRigidbody2D;
-		[SerializeField]
-		protected Transform m_SpawnPoint;
-		[SerializeField]
-		protected ParticleSystem m_ParticleSystem;
-		[SerializeField]
-		[Range (-100f, 100f)]
-		protected float m_RandomForceYMinimum = -10f;
-		[SerializeField]
-		[Range (-100f, 100f)]
-		protected float m_RandomForceYMaximum = 10f;
-		[SerializeField]
-		[Range (-100f, 100f)]
-		protected float m_RandomForceXMinimum = -10f;
-		[SerializeField]
-		[Range (-100f, 100f)]
-		protected float m_RandomForceXMaximum = 10f;
-
-		protected Character m_CurrentCharacter;
-
 		public override Animator Animator {
 			get {
 				return m_Animator;
@@ -139,6 +104,7 @@ namespace RedRunner.Collectables
 		public override void OnCollisionEnter2D (Collision2D collision2D)
 		{
 			Character character = collision2D.collider.GetComponent<Character> ();
+
 			if (!m_UseOnTriggerEnter2D && character != null) {
 				m_CurrentCharacter = character;
 				Collect ();
@@ -148,6 +114,7 @@ namespace RedRunner.Collectables
 		public override void OnTriggerEnter2D (Collider2D other)
 		{
 			Character character = other.GetComponent<Character> ();
+
 			if (m_UseOnTriggerEnter2D && character != null) {
 				m_CurrentCharacter = character;
 				Collect ();
@@ -161,16 +128,29 @@ namespace RedRunner.Collectables
 
 		public virtual void OnChestOpened ()
 		{
-			AudioManager.Singleton.PlayChestSound (transform.position);
-			m_ParticleSystem.Play ();
+			PlayChestSound();
+
 			int coinsCount = Random.Range (m_MinimumCoins, m_MaximumCoins);
-			for (int i = 0; i < coinsCount; i++) {
-				CoinRigidbody2D coin = Instantiate<CoinRigidbody2D> (m_CoinRigidbody2D, m_SpawnPoint.position, Quaternion.identity, transform);
-				float x = Random.Range (m_RandomForceXMinimum, m_RandomForceXMaximum);
-				float y = Random.Range (m_RandomForceYMinimum, m_RandomForceYMaximum);
-				Vector2 force = new Vector2 (x, y);
-				coin.Rigidbody2D.AddForce (force, ForceMode2D.Impulse);
-				StartCoroutine (IgnoreAndEnableCollision (m_CurrentCharacter.Collider2D, coin.Collider2D));
+
+			DoWithCoins();
+		}
+
+		public void PlayChestSound()
+        {
+			AudioManager.Singleton.PlayChestSound(transform.position);
+			m_ParticleSystem.Play();
+		}
+
+		public void DoWithCoins()
+        {
+			for (int i = 0; i < coinsCount; i++)
+			{
+				CoinRigidbody2D coin = Instantiate<CoinRigidbody2D>(m_CoinRigidbody2D, m_SpawnPoint.position, Quaternion.identity, transform);
+				float x = Random.Range(m_RandomForceXMinimum, m_RandomForceXMaximum);
+				float y = Random.Range(m_RandomForceYMinimum, m_RandomForceYMaximum);
+				Vector2 force = new Vector2(x, y);
+				coin.Rigidbody2D.AddForce(force, ForceMode2D.Impulse);
+				StartCoroutine(IgnoreAndEnableCollision(m_CurrentCharacter.Collider2D, coin.Collider2D));
 			}
 		}
 

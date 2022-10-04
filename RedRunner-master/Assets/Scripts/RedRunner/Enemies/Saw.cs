@@ -41,12 +41,19 @@ namespace RedRunner.Enemies
 		void Update ()
 		{
 			Vector3 rotation = targetRotation.rotation.eulerAngles;
-			if (!m_RotateClockwise) {
+			if (!m_RotateClockwise)
+			{
 				rotation.z += m_Speed;
-			} else {
-				rotation.z -= m_Speed;
+				targetRotation.rotation = Quaternion.Euler(rotation);
+				break;
 			}
-			targetRotation.rotation = Quaternion.Euler (rotation);
+			IfRotateCCW();
+		}
+
+		void IfRotateCCW()
+        {
+			rotation.z -= m_Speed;
+			targetRotation.rotation = Quaternion.Euler(rotation);
 		}
 
 		void OnCollisionEnter2D (Collision2D collision2D)
@@ -60,22 +67,48 @@ namespace RedRunner.Enemies
 		void OnCollisionStay2D (Collision2D collision2D)
 		{
 			if (collision2D.collider.CompareTag ("Player")) {
-				if (m_AudioSource.clip != m_SawingSound) {
-					m_AudioSource.clip = m_SawingSound;
-				} else if (!m_AudioSource.isPlaying) {
-					m_AudioSource.Play ();
-				}
+				PlaySawingSound();
 			}
 		}
 
 		void OnCollisionExit2D (Collision2D collision2D)
 		{
 			if (collision2D.collider.CompareTag ("Player")) {
-				if (m_AudioSource.clip != m_DefaultSound) {
-					m_AudioSource.clip = m_DefaultSound;
-				}
-				m_AudioSource.Play ();
+
+				PlayDefaultSound();
+				PlaySound();
 			}
+		}
+
+        void PlaySawingSound()
+        {
+			if (m_AudioSource.clip != m_SawingSound)
+			{
+				m_AudioSource.clip = m_SawingSound;
+			}
+
+			CheckAnotherAudioSauce(); 
+		}
+
+		void CheckAnotherAudioSauce()
+        {
+			if (!m_AudioSource.isPlaying)
+			{
+				PlaySound();
+			}
+		}
+
+		void PlayDefaultSound()
+        {
+			if (m_AudioSource.clip != m_DefaultSound)
+			{
+				m_AudioSource.clip = m_DefaultSound;
+			}
+		}
+
+		void PlaySound()
+        {
+			m_AudioSource.Play();
 		}
 
 		public override void Kill (Character target)
