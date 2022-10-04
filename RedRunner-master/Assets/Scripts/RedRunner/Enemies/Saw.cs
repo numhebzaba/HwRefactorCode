@@ -87,6 +87,11 @@ namespace RedRunner.Enemies
 				m_AudioSource.clip = m_SawingSound;
 			}
 
+			CheckAnotherAudioSauce(); 
+		}
+
+		void CheckAnotherAudioSauce()
+        {
 			if (!m_AudioSource.isPlaying)
 			{
 				PlaySound();
