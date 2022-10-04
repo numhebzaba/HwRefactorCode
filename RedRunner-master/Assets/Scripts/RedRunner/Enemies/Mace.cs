@@ -60,15 +60,21 @@ namespace RedRunner.Enemies
         {
 			if (character != null && !character.IsDead.Value)
 			{
-				if (pressable)
-				{
-					Slam(position);
-					Vector3 scale = character.transform.localScale;
-					scale.y = m_MaulScale;
-					character.transform.localScale = scale;
-				}
+				IfAliveAndPressable();
 				Kill(character);
 			}
+		}
+
+		public void IfAliveAndPressable()
+		{
+			if (pressable)
+			{
+			    Slam(position);
+			    Vector3 scale = character.transform.localScale;
+			    scale.y = m_MaulScale;
+			    character.transform.localScale = scale;
+			}
+			
 		}
 
 		public void Pressable()
