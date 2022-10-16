@@ -38,7 +38,8 @@ namespace RedRunner
         private Texture2D m_CursorClickTexture;
         [SerializeField]
         private float m_CursorHideDelay = 1f;
-
+        [SerializeField]
+        InputUIChecker inputUIChecker;
         public List<UIScreen> UISCREENS
         {
             get
@@ -76,7 +77,7 @@ namespace RedRunner
 
         void Update()
         {
-            if (Input.GetButtonDown("Cancel"))
+            if (inputUIChecker.IsCancle())
             {
                 //Added enumeration to store screen info, aka type, so it will be easier to understand it
                 var pauseScreen = GetUIScreen(UIScreenInfo.PAUSE_SCREEN);
@@ -106,11 +107,11 @@ namespace RedRunner
                 }
             }
 
-            if (Input.GetMouseButtonDown(0))
+            if (inputUIChecker.IsHold())
             {
                 Cursor.SetCursor(m_CursorClickTexture, Vector2.zero, CursorMode.Auto);
             }
-            else if (Input.GetMouseButtonUp(0))
+            else if (inputUIChecker.IsRelease())
             {
                 Cursor.SetCursor(m_CursorDefaultTexture, Vector2.zero, CursorMode.Auto);
             }
