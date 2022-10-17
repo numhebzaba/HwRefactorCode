@@ -1,0 +1,14 @@
+[
+    {
+        "platform" : "Twitter",
+        "link" : "https://twitter.com/intent/tweet?text={0}&url={1}"
+    },
+    {
+        "platform" : "GooglePlus",
+        "link" : "https://plus.google.com/share?text={0}&href={1}"
+    },
+    {
+        "platform" : "Facebook",
+        "link" : "https://www.facebook.com/sharer/sharer.php?u={1}"
+    }
+]
