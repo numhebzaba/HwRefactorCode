@@ -1,8 +1,10 @@
 ﻿using System;
 using UnityEngine;
 using RedRunner.Characters;
+using RedRunner.TerrainGenerationVariables;
+using RedRunner.TerrainGeneration;
 
-public class RemoveTerrain : TerrainGenerationVariables
+public class RemoveTerrain : TerrainGeneratorVariables
 {
 	protected virtual void Reset()
 	{
@@ -29,40 +31,6 @@ public class RemoveTerrain : TerrainGenerationVariables
 		m_GeneratedMiddleBlocksCount = 0;
 		m_GeneratedEndBlocksCount = 0;
 		m_Reset = false;
-	}
-
-	public virtual void Remove()
-	{
-		List<Block> blocksToRemove = new List<Block>();
-		foreach (KeyValuePair<Vector3, Block> block in m_Blocks)
-		{
-			if (block.Value.transform.position.x - m_CurrentX > m_DestroyRange)
-			{
-				blocksToRemove.Add(block.Value);
-			}
-		}
-		List<BackgroundBlock> backgroundBlocksToRemove = new List<BackgroundBlock>();
-
-		RemoveBackground();
-	}
-
-	public void RemoveBackground()
-	{
-		foreach (KeyValuePair<Vector3, BackgroundBlock> block in m_BackgroundBlocks)
-		{
-			if (block.Value.transform.position.x - m_FathestBackgroundX > m_DestroyRange)
-			{
-				backgroundBlocksToRemove.Add(block.Value);
-			}
-		}
-		for (int i = 0; i < blocksToRemove.Count; i++)
-		{
-			RemoveBlock(blocksToRemove[i]);
-		}
-		for (int i = 0; i < backgroundBlocksToRemove.Count; i++)
-		{
-			RemoveBackgroundBlock(backgroundBlocksToRemove[i]);
-		}
 	}
 
 	public virtual void RemoveAll()

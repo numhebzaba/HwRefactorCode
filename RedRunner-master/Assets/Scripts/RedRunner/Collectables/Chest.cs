@@ -101,7 +101,9 @@ namespace RedRunner.Collectables
 			}
 		}
 
-		public override void OnCollisionEnter2D (Collision2D collision2D)
+        public int coinsCount { get; private set; }
+
+        public override void OnCollisionEnter2D (Collision2D collision2D)
 		{
 			Character character = collision2D.collider.GetComponent<Character> ();
 

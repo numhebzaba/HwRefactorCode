@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 using RedRunner.Characters;
+using RedRunner.TerrainGeneration;
 
 namespace RedRunner.TerrainGenerationVariables
 {

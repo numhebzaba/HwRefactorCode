@@ -48,7 +48,7 @@ namespace RedRunner.Enemies
 
 		protected virtual void Update ()
 		{
-			Collider2D [] colliders = Physics2D.OverlapCircleAll ( transform.parent.position, m_MaximumDistance, LayerMask.GetMask ( "Characters" ) );
+			Collider2D [] colliders = Physics2D.OverlapCircleAll (transform.parent.position, m_MaximumDistance, LayerMask.GetMask ( "Characters" ) );
 
 			for ( int i = 0; i < colliders.Length; i++ )
 			{
@@ -62,7 +62,7 @@ namespace RedRunner.Enemies
         {
 			if (character != null)
 			{
-				m_LatestCharacter = character;
+				m_LatestCharacter = Collectable.character;
 			}
 		}
 

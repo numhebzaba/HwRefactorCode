@@ -4,7 +4,7 @@ using UnityEngine;
 
 using RedRunner.Characters;
 
-public abstract class EyesVariables : Monobahavior
+public abstract class EyesVariables
 {
 	[SerializeField]
 	protected float m_Radius = 1f;

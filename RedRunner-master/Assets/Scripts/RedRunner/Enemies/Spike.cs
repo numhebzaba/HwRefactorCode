@@ -31,11 +31,11 @@ namespace RedRunner.Enemies
 
 				CheckDistanceBetween();
 
-				CheckIfTop();
+				CheckIfTop(character, isTop);
 			}
 		}
 
-		void CheckIfTop()
+		void CheckIfTop(Character character, bool isTop)
         {
 			if (isTop)
 			{
