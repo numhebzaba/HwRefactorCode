@@ -179,15 +179,23 @@ namespace RedRunner
         {
             if (m_GameRunning)
             {
-                if (m_MainCharacter.transform.position.x > m_StartScoreX && m_MainCharacter.transform.position.x > m_Score)
+                MainCharec();
+            }
+        }
+
+        void MainCharec(){
+            if (m_MainCharacter.transform.position.x > m_StartScoreX && m_MainCharacter.transform.position.x > m_Score)
                 {
                     m_Score = m_MainCharacter.transform.position.x;
-                    if (OnScoreChanged != null)
+                    OnScore();
+                }
+        }
+
+        void OnScore(){
+            if (OnScoreChanged != null)
                     {
                         OnScoreChanged(m_Score, m_HighScore, m_LastScore);
                     }
-                }
-            }
         }
 
         IEnumerator Load()
