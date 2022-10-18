@@ -105,6 +105,16 @@ namespace RedRunner
                     }
                 }
             }
+        void AcriveScreen(){
+            if (m_ActiveScreen == pauseScreen)
+                    {
+                        CloseScreen(pauseScreen);
+                        OpenScreen(ingameScreen);
+                        ////We are sure that we want to resume the game when we close a screen
+                        GameManager.Singleton.ResumeGame();
+                    }
+
+        }
 
             if (Input.GetMouseButtonDown(0))
             {
@@ -114,7 +124,7 @@ namespace RedRunner
             {
                 Cursor.SetCursor(m_CursorDefaultTexture, Vector2.zero, CursorMode.Auto);
             }
-        }
+        
 
         public void OpenWindow(UIWindow window)
         {
