@@ -6,24 +6,10 @@ using RedRunner.Characters;
 
 namespace RedRunner.Enemies
 {
-
 	public class Saw : Enemy
 	{
-
 		[SerializeField]
 		private Collider2D m_Collider2D;
-		[SerializeField]
-		private Transform targetRotation;
-		[SerializeField]
-		private float m_Speed = 1f;
-		[SerializeField]
-		private bool m_RotateClockwise = false;
-		[SerializeField]
-		private AudioClip m_DefaultSound;
-		[SerializeField]
-		private AudioClip m_SawingSound;
-		[SerializeField]
-		private AudioSource m_AudioSource;
 
 		public override Collider2D Collider2D {
 			get {
@@ -41,19 +27,19 @@ namespace RedRunner.Enemies
 		void Update ()
 		{
 			Vector3 rotation = targetRotation.rotation.eulerAngles;
+			Checkm_RotateWay(rotation);
+
+			targetRotation.rotation = Quaternion.Euler (rotation);
+		}
+
+		void Checkm_RotateWay(Vector3 rotation)
+        {
 			if (!m_RotateClockwise)
 			{
 				rotation.z += m_Speed;
-				targetRotation.rotation = Quaternion.Euler(rotation);
-				break;
+				return;
 			}
-			IfRotateCCW();
-		}
-
-		void IfRotateCCW()
-        {
 			rotation.z -= m_Speed;
-			targetRotation.rotation = Quaternion.Euler(rotation);
 		}
 
 		void OnCollisionEnter2D (Collision2D collision2D)
@@ -66,49 +52,39 @@ namespace RedRunner.Enemies
 
 		void OnCollisionStay2D (Collision2D collision2D)
 		{
-			if (collision2D.collider.CompareTag ("Player")) {
-				PlaySawingSound();
+			if (collision2D.collider.CompareTag ("Player")) 
+			{
+				CheckPlayingSound();
+			}
+		}
+
+		void CheckPlayingSound()
+        {
+			if (m_AudioSource.clip != m_SawingSound)
+			{
+				m_AudioSource.clip = m_SawingSound;
+			}
+			else if (!m_AudioSource.isPlaying)
+			{
+				m_AudioSource.Play();
 			}
 		}
 
 		void OnCollisionExit2D (Collision2D collision2D)
 		{
 			if (collision2D.collider.CompareTag ("Player")) {
+				CheckDefaultSoundIsPlaying();
 
-				PlayDefaultSound();
-				PlaySound();
+				m_AudioSource.Play ();
 			}
 		}
 
-        void PlaySawingSound()
-        {
-			if (m_AudioSource.clip != m_SawingSound)
-			{
-				m_AudioSource.clip = m_SawingSound;
-			}
-
-			CheckAnotherAudioSauce(); 
-		}
-
-		void CheckAnotherAudioSauce()
-        {
-			if (!m_AudioSource.isPlaying)
-			{
-				PlaySound();
-			}
-		}
-
-		void PlayDefaultSound()
+		void CheckDefaultSoundIsPlaying()
         {
 			if (m_AudioSource.clip != m_DefaultSound)
 			{
 				m_AudioSource.clip = m_DefaultSound;
 			}
-		}
-
-		void PlaySound()
-        {
-			m_AudioSource.Play();
 		}
 
 		public override void Kill (Character target)

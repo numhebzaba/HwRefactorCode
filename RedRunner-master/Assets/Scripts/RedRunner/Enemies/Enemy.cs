@@ -15,8 +15,24 @@ namespace RedRunner.Enemies
 
 		public abstract void Kill ( Character target );
 
+		//////////////////////Saw Variables//////////////////////
+
+		
 		[SerializeField]
-		protected Collider2D m_Collider2D;
+		protected Transform targetRotation;
+		[SerializeField]
+		protected float m_Speed = 1f;
+		[SerializeField]
+		protected bool m_RotateClockwise = false;
+		[SerializeField]
+		protected AudioClip m_DefaultSound;
+		[SerializeField]
+		protected AudioClip m_SawingSound;
+		[SerializeField]
+		protected AudioSource m_AudioSource;
+
+		////////////////////Mace Variables//////////////////
+
 		[SerializeField]
 		protected Animator m_Animator;
 		[SerializeField]
@@ -27,6 +43,8 @@ namespace RedRunner.Enemies
 		protected float m_MaulScale = 0.8f;
 		[SerializeField]
 		protected ParticleSystem m_ParticleSystem;
+
+
 
 	}
 

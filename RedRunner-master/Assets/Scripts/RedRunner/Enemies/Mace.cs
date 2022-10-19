@@ -10,6 +10,10 @@ namespace RedRunner.Enemies
 
 	public class Mace : Enemy
 	{
+
+		[SerializeField]
+		protected Collider2D m_Collider2D;
+
 		public override Collider2D Collider2D {
 			get {
 				return m_Collider2D;
@@ -37,54 +41,45 @@ namespace RedRunner.Enemies
 			Vector2 position = collision2D.contacts [0].point;
 			Character character = collision2D.collider.GetComponent<Character> ();
 			bool pressable = false;
-			HowMuchToPress();
+			isNotPressable(pressable, collision2D);
 
-			IfAlive();
+			if (pressable && character == null && !collision2D.collider.CompareTag ("Player")) {
+				Slam (position);
+			}
+
+			if (character != null && !character.IsDead.Value) {
+				isPressable(pressable, character, position);
+				Kill (character);
+			}
 //			Camera.main.GetComponent<CameraControl> ().Shake (3f, 30, 300f);
 		}
 
-		void HowMuchToPress()
+		void isNotPressable(bool pressable, Collision2D collision2D)
         {
 			for (int i = 0; i < collision2D.contacts.Length; i++)
 			{
-				Pressable();
-			}
-
-			if (pressable && character == null && !collision2D.collider.CompareTag("Player"))
-			{
-				Slam(position);
+				if (!pressable)
+				{
+					pressable = (collision2D.contacts[i].normal.y >= 0.8f && collision2D.contacts[i].normal.y <= 1f && m_PathFollower.Velocity.y > m_MaulSpeed) ||
+					(collision2D.contacts[i].normal.y <= -0.8f && collision2D.contacts[i].normal.y >= -1f && m_PathFollower.Velocity.y < m_MaulSpeed) ||
+					(collision2D.contacts[i].normal.x >= 0.8f && collision2D.contacts[i].normal.x <= 1f && m_PathFollower.Velocity.x < m_MaulSpeed) ||
+					(collision2D.contacts[i].normal.x <= -0.8f && collision2D.contacts[i].normal.x >= -1f && m_PathFollower.Velocity.x > m_MaulSpeed);
+				}
+				else
+				{
+					break;
+				}
 			}
 		}
 
-		public void IfAlive()
+		void isPressable(bool pressable, Character character, Vector2 position)
         {
-			if (character != null && !character.IsDead.Value)
-			{
-				IfAliveAndPressable();
-				Kill(character);
-			}
-		}
-
-		public void IfAliveAndPressable()
-		{
 			if (pressable)
 			{
-			    Slam(position);
-			    Vector3 scale = character.transform.localScale;
-			    scale.y = m_MaulScale;
-			    character.transform.localScale = scale;
-			}
-			
-		}
-
-		public void Pressable()
-        {
-			if (!pressable)
-			{
-				pressable = (collision2D.contacts[i].normal.y >= 0.8f && collision2D.contacts[i].normal.y <= 1f && m_PathFollower.Velocity.y > m_MaulSpeed) ||
-				(collision2D.contacts[i].normal.y <= -0.8f && collision2D.contacts[i].normal.y >= -1f && m_PathFollower.Velocity.y < m_MaulSpeed) ||
-				(collision2D.contacts[i].normal.x >= 0.8f && collision2D.contacts[i].normal.x <= 1f && m_PathFollower.Velocity.x < m_MaulSpeed) ||
-				(collision2D.contacts[i].normal.x <= -0.8f && collision2D.contacts[i].normal.x >= -1f && m_PathFollower.Velocity.x > m_MaulSpeed);
+				Slam(position);
+				Vector3 scale = character.transform.localScale;
+				scale.y = m_MaulScale;
+				character.transform.localScale = scale;
 			}
 		}
 

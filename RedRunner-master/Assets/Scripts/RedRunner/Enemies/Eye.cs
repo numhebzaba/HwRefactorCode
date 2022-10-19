@@ -6,6 +6,7 @@ using RedRunner.Characters;
 
 namespace RedRunner.Enemies
 {
+
 	public class Eye : EyesVariables
 	{
 		public virtual float Radius {
@@ -48,22 +49,16 @@ namespace RedRunner.Enemies
 
 		protected virtual void Update ()
 		{
-			Collider2D [] colliders = Physics2D.OverlapCircleAll (transform.parent.position, m_MaximumDistance, LayerMask.GetMask ( "Characters" ) );
-
+			Collider2D [] colliders = Physics2D.OverlapCircleAll ( transform.parent.position, m_MaximumDistance, LayerMask.GetMask ( "Characters" ) );
 			for ( int i = 0; i < colliders.Length; i++ )
 			{
 				Character character = colliders [ i ].GetComponent<Character> ();
-				CheckCharacter();
+				if ( character != null )
+				{
+					m_LatestCharacter = character;
+				}
 			}
 			SetupPupil ();
-		}
-
-		protected void CheckCharacter()
-        {
-			if (character != null)
-			{
-				m_LatestCharacter = Collectable.character;
-			}
 		}
 
 		protected virtual void OnDrawGizmos ()
@@ -78,50 +73,35 @@ namespace RedRunner.Enemies
 			{
 				float speed = m_Speed;
 				Vector3 distanceToTarget = m_LatestCharacter.transform.position - m_Pupil.position;
+				if ( m_LatestCharacter.IsDead.Value )
+				{
+					speed = m_DeadSpeed;
+					distanceToTarget = Vector3.ClampMagnitude ( m_DeadPosition, m_Radius );
+					Vector3 finalPupilPosition = transform.position + distanceToTarget;
+					m_PupilDestination = finalPupilPosition;
+				}
 
-				IsDead();
+				CharacterNotDead(distanceToTarget);
+				m_Pupil.position = Vector3.MoveTowards ( m_Pupil.position, m_PupilDestination, speed );
 			}
 		}
 
-		protected void IsDead()
+		void CharacterNotDead(Vector3 distanceToTarget)
         {
-			if (m_LatestCharacter.IsDead.Value)
-			{
-				speed = m_DeadSpeed;
-				distanceToTarget = Vector3.ClampMagnitude(m_DeadPosition, m_Radius);
-				Vector3 finalPupilPosition = transform.position + distanceToTarget;
-				m_PupilDestination = finalPupilPosition;
-				m_Pupil.position = Vector3.MoveTowards(m_Pupil.position, m_PupilDestination, speed);
-				break;
-			}
-			IfNotDead();
-		}
-
-		protected void IfNotDead()
-        {
-			float distance = Vector3.Distance(m_LatestCharacter.transform.position, transform.parent.position);
-			CheckDistance();
-
+			DistanceLesserThanMaxDistance(distanceToTarget);
 			Vector3 finalPupilPosition = transform.position + distanceToTarget;
 			m_PupilDestination = finalPupilPosition;
-			m_Pupil.position = Vector3.MoveTowards(m_Pupil.position, m_PupilDestination, speed);
 		}
 
-		protected void CheckDistance()
+		void DistanceLesserThanMaxDistance(Vector3 distanceToTarget)
         {
+			float distance = Vector3.Distance(m_LatestCharacter.transform.position, transform.parent.position);
 			if (distance <= m_MaximumDistance)
 			{
 				distanceToTarget = Vector3.ClampMagnitude(distanceToTarget, m_Radius);
-				break;
 			}
-			DistanceFurtherThanMaxDistance();
-		}
-
-		protected void DistanceFurtherThanMaxDistance()
-        {
 			distanceToTarget = Vector3.ClampMagnitude(m_InitialPosition, m_Radius);
 		}
-
 	}
 
 }

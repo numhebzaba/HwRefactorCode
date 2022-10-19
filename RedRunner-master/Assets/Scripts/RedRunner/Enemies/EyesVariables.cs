@@ -1,10 +1,11 @@
-﻿using System.Collections;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 using RedRunner.Characters;
+using RedRunner.Utilities;
 
-public abstract class EyesVariables
+public class EyesVariables : MonoBehaviour
 {
 	[SerializeField]
 	protected float m_Radius = 1f;
