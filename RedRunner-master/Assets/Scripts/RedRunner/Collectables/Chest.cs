@@ -6,8 +6,12 @@ using RedRunner.Characters;
 
 namespace RedRunner.Collectables
 {
+
 	public class Chest : Collectable
 	{
+
+		protected Character m_CurrentCharacter;
+
 		public override Animator Animator {
 			get {
 				return m_Animator;
@@ -101,12 +105,9 @@ namespace RedRunner.Collectables
 			}
 		}
 
-        public int coinsCount { get; private set; }
-
-        public override void OnCollisionEnter2D (Collision2D collision2D)
+		public override void OnCollisionEnter2D (Collision2D collision2D)
 		{
 			Character character = collision2D.collider.GetComponent<Character> ();
-
 			if (!m_UseOnTriggerEnter2D && character != null) {
 				m_CurrentCharacter = character;
 				Collect ();
@@ -116,7 +117,6 @@ namespace RedRunner.Collectables
 		public override void OnTriggerEnter2D (Collider2D other)
 		{
 			Character character = other.GetComponent<Character> ();
-
 			if (m_UseOnTriggerEnter2D && character != null) {
 				m_CurrentCharacter = character;
 				Collect ();
@@ -130,20 +130,14 @@ namespace RedRunner.Collectables
 
 		public virtual void OnChestOpened ()
 		{
-			PlayChestSound();
-
+			AudioManager.Singleton.PlayChestSound (transform.position);
+			m_ParticleSystem.Play ();
 			int coinsCount = Random.Range (m_MinimumCoins, m_MaximumCoins);
-
-			DoWithCoins();
+			OnChestopenedCoins(coinsCount);
+			
 		}
 
-		public void PlayChestSound()
-        {
-			AudioManager.Singleton.PlayChestSound(transform.position);
-			m_ParticleSystem.Play();
-		}
-
-		public void DoWithCoins()
+		void OnChestopenedCoins(int coinsCount)
         {
 			for (int i = 0; i < coinsCount; i++)
 			{
@@ -162,7 +156,5 @@ namespace RedRunner.Collectables
 			yield return new WaitForSeconds (0.3f);
 			Physics2D.IgnoreCollision (collider2D1, collider2D2, false);
 		}
-	
 	}
-
 }

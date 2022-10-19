@@ -1,5 +1,4 @@
-﻿using RedRunner.Characters;
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -28,7 +27,7 @@ namespace RedRunner.Collectables
 
 		public abstract void Collect ();
 
-		//-------------------For Chest Script------------------------//
+		////////////////////////////////////////Chest Variables/////////////////////////////////////
 
 		[SerializeField]
 		protected Animator m_Animator;
@@ -61,7 +60,8 @@ namespace RedRunner.Collectables
 		[Range(-100f, 100f)]
 		protected float m_RandomForceXMaximum = 10f;
 
-		protected Character m_CurrentCharacter;
+		
+
 
 	}
 

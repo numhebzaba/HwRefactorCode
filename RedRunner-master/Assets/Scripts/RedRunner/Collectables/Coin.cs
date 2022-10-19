@@ -9,16 +9,7 @@ namespace RedRunner.Collectables
 {
 	public class Coin : Collectable
 	{
-		[SerializeField]
-		protected ParticleSystem m_ParticleSystem;
-		[SerializeField]
-		protected SpriteRenderer m_SpriteRenderer;
-		[SerializeField]
-		protected Collider2D m_Collider2D;
-		[SerializeField]
-		protected Animator m_Animator;
-		[SerializeField]
-		protected bool m_UseOnTriggerEnter2D = true;
+		
 
 		public override SpriteRenderer SpriteRenderer {
 			get {
