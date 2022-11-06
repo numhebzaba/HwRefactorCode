@@ -1,14 +1,21 @@
 [
     {
         "platform" : "Twitter",
-        "link" : "https://twitter.com/intent/tweet?text={0}&url={1}"
+        "link" : "https://twitter.com/intent/tweet?text={0}&url={1}",
+        "order" : 1,
+        "active" : "yes"
     },
     {
         "platform" : "GooglePlus",
-        "link" : "https://plus.google.com/share?text={0}&href={1}"
+        "link" : "https://plus.google.com/share?text={0}&href={1}",
+        "order" : 2,
+        "active" : "no"
+        
     },
     {
         "platform" : "Facebook",
-        "link" : "https://www.facebook.com/sharer/sharer.php?u={1}"
+        "link" : "https://www.facebook.com/sharer/sharer.php?u={1}",
+        "order" : 3,
+        "active" : "yes"
     }
 ]
