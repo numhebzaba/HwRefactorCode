@@ -51,9 +51,14 @@ namespace RedRunner.TerrainGeneration
 				Destroy ( gameObject );
 				return;
 			}
+			SetBGWgenAwake();
+		}
+
+		void SetBGWgenAwake()
+        {
 			m_Singleton = this;
-			m_Blocks = new Dictionary<Vector3, Block> ();
-			m_BackgroundBlocks = new Dictionary<Vector3, BackgroundBlock> ();
+			m_Blocks = new Dictionary<Vector3, Block>();
+			m_BackgroundBlocks = new Dictionary<Vector3, BackgroundBlock>();
 			m_BackgroundLayers = new BackgroundLayer[m_Settings.BackgroundLayers.Length];
 			SetBackgroundWhenStart();
 			GameManager.OnReset += Reset;
@@ -70,17 +75,24 @@ namespace RedRunner.TerrainGeneration
 		protected virtual void Reset ()
 		{
 			m_Reset = true;
-			RemoveAll ();
-			m_CurrentX = 0f;
+			//RemoveTerrain removeAllBlock = new RemoveTerrain();
+			//removeAllBlock.RemoveAll();
+            RemoveAll();
+            m_CurrentX = 0f;
 			m_LastBlock = null;
 			m_LastBackgroundBlock = null;
 			for ( int i = 0; i < m_BackgroundLayers.Length; i++ )
 			{
 				m_BackgroundLayers [ i ].Reset ();
 			}
+			ResetBlockCounts();
+		}
+
+		void ResetBlockCounts()
+        {
 			m_FathestBackgroundX = 0f;
-			m_Blocks.Clear ();
-			m_BackgroundBlocks.Clear ();
+			m_Blocks.Clear();
+			m_BackgroundBlocks.Clear();
 			m_GeneratedStartBlocksCount = 0;
 			m_GeneratedMiddleBlocksCount = 0;
 			m_GeneratedEndBlocksCount = 0;
@@ -101,164 +113,86 @@ namespace RedRunner.TerrainGeneration
 			if ( m_RemoveTime < Time.time )
 			{
 				m_RemoveTime = Time.time + 5f;
-				Remove ();
-			}
-			Generate ();
-		}
+				//RemoveTerrain removeTerrain = new RemoveTerrain();
+				//removeTerrain.Remove();
+                Remove();
+            }
 
-		public virtual void Generate ()
-		{
-			if ( m_CurrentX < m_Settings.LevelLength || m_Settings.LevelLength <= 0 )
-			{
-				bool isEnd = false, isStart = false, isMiddle = false;
-				Block block = null;
-				Vector3 current = new Vector3 ( m_CurrentX, 0f, 0f );
-				float newX = 0f;
-				if ( m_GeneratedStartBlocksCount < m_Settings.StartBlocksCount || m_Settings.StartBlocksCount <= 0 )
-				{
-					isStart = true;
-					block = ChooseFrom ( m_Settings.StartBlocks );
-				}
-				else if ( m_GeneratedMiddleBlocksCount < m_Settings.MiddleBlocksCount || m_Settings.MiddleBlocksCount <= 0 )
-				{
-					isMiddle = true;
-					block = ChooseFrom ( m_Settings.MiddleBlocks );
-				}
-				else if ( m_GeneratedEndBlocksCount < m_Settings.EndBlocksCount || m_Settings.EndBlocksCount <= 0 )
-				{
-					isEnd = true;
-					block = ChooseFrom ( m_Settings.EndBlocks );
-				}
-				if ( m_LastBlock != null )
-				{
-					newX = m_CurrentX + m_LastBlock.Width;
-				}
-				else
-				{
-					newX = 0f;
-				}
-				if ( block != null && ( m_LastBlock == null || newX < m_Character.transform.position.x + m_GenerateRange ) )
-				{
-					if ( isStart )
-					{
-						if ( m_Settings.StartBlocksCount > 0 )
-						{
-							m_GeneratedStartBlocksCount++;
-						}
-					}
-					else if ( isMiddle )
-					{
-						if ( m_Settings.MiddleBlocksCount > 0 )
-						{
-							m_GeneratedMiddleBlocksCount++;
-						}
-					}
-					else if ( isEnd )
-					{
-						if ( m_Settings.EndBlocksCount > 0 )
-						{
-							m_GeneratedEndBlocksCount++;
-						}
-					}
-					CreateBlock ( block, current );
-				}
-			}
-			for ( int i = 0; i < m_BackgroundLayers.Length; i++ )
-			{
-				int random = Random.Range ( 0, 2 );
-				bool generate = random == 1 ? true : false;
-				if ( !generate )
-				{
-					continue;
-				}
-				Vector3 current = new Vector3 ( m_BackgroundLayers [ i ].CurrentX, 0f, 0f );
-				BackgroundBlock block = ( BackgroundBlock )ChooseFrom ( m_BackgroundLayers [ i ].Blocks );
-				float newX = 0f;
-				if ( m_BackgroundLayers [ i ].LastBlock != null )
-				{
-					newX = m_BackgroundLayers [ i ].CurrentX + m_BackgroundLayers [ i ].LastBlock.Width;
-				}
-				else
-				{
-					newX = 0f;
-				}
-				if ( block != null && ( m_BackgroundLayers [ i ].LastBlock == null || newX < m_Character.transform.position.x + m_BackgroundGenerateRange ) )
-				{
-					CreateBackgroundBlock ( block, current, m_BackgroundLayers [ i ], i );
-				}
-			}
-		}
+            //GenerateTerrain generateTerrain = new GenerateTerrain();
+            //generateTerrain.Generate();
+            Generate();
+        }
 
-		public virtual void Remove ()
-		{
-			List<Block> blocksToRemove = new List<Block> ();
-			foreach ( KeyValuePair<Vector3, Block> block in m_Blocks )
-			{
-				if ( block.Value.transform.position.x - m_CurrentX > m_DestroyRange )
-				{
-					blocksToRemove.Add ( block.Value );
-				}
-			}
-			List<BackgroundBlock> backgroundBlocksToRemove = new List<BackgroundBlock> ();
-			foreach ( KeyValuePair<Vector3, BackgroundBlock> block in m_BackgroundBlocks )
-			{
-				if ( block.Value.transform.position.x - m_FathestBackgroundX > m_DestroyRange )
-				{
-					backgroundBlocksToRemove.Add ( block.Value );
-				}
-			}
-			for ( int i = 0; i < blocksToRemove.Count; i++ )
-			{
-				RemoveBlock ( blocksToRemove [ i ] );
-			}
-			for ( int i = 0; i < backgroundBlocksToRemove.Count; i++ )
-			{
-				RemoveBackgroundBlock ( backgroundBlocksToRemove [ i ] );
-			}
-		}
+        public virtual void Remove()
+        {
+            List<Block> blocksToRemove = new List<Block>();
+            foreach (KeyValuePair<Vector3, Block> block in m_Blocks)
+            {
+                if (block.Value.transform.position.x - m_CurrentX > m_DestroyRange)
+                {
+                    blocksToRemove.Add(block.Value);
+                }
+            }
+            List<BackgroundBlock> backgroundBlocksToRemove = new List<BackgroundBlock>();
+            foreach (KeyValuePair<Vector3, BackgroundBlock> block in m_BackgroundBlocks)
+            {
+                if (block.Value.transform.position.x - m_FathestBackgroundX > m_DestroyRange)
+                {
+                    backgroundBlocksToRemove.Add(block.Value);
+                }
+            }
+            for (int i = 0; i < blocksToRemove.Count; i++)
+            {
+                RemoveBlock(blocksToRemove[i]);
+            }
+            for (int i = 0; i < backgroundBlocksToRemove.Count; i++)
+            {
+                RemoveBackgroundBlock(backgroundBlocksToRemove[i]);
+            }
+        }
 
-		public virtual void RemoveAll ()
-		{
-			List<Block> blocksToRemove = new List<Block> ();
-			foreach ( KeyValuePair<Vector3, Block> block in m_Blocks )
-			{
-				blocksToRemove.Add ( block.Value );
-			}
-			List<BackgroundBlock> backgroundBlocksToRemove = new List<BackgroundBlock> ();
-			foreach ( KeyValuePair<Vector3, BackgroundBlock> block in m_BackgroundBlocks )
-			{
-				backgroundBlocksToRemove.Add ( block.Value );
-			}
-			for ( int i = 0; i < blocksToRemove.Count; i++ )
-			{
-				RemoveBlock ( blocksToRemove [ i ] );
-			}
-			for ( int i = 0; i < backgroundBlocksToRemove.Count; i++ )
-			{
-				RemoveBackgroundBlock ( backgroundBlocksToRemove [ i ] );
-			}
-		}
+        public virtual void RemoveAll()
+        {
+            List<Block> blocksToRemove = new List<Block>();
+            foreach (KeyValuePair<Vector3, Block> block in m_Blocks)
+            {
+                blocksToRemove.Add(block.Value);
+            }
+            List<BackgroundBlock> backgroundBlocksToRemove = new List<BackgroundBlock>();
+            foreach (KeyValuePair<Vector3, BackgroundBlock> block in m_BackgroundBlocks)
+            {
+                backgroundBlocksToRemove.Add(block.Value);
+            }
+            for (int i = 0; i < blocksToRemove.Count; i++)
+            {
+                RemoveBlock(blocksToRemove[i]);
+            }
+            for (int i = 0; i < backgroundBlocksToRemove.Count; i++)
+            {
+                RemoveBackgroundBlock(backgroundBlocksToRemove[i]);
+            }
+        }
 
-		public virtual void RemoveBlockAt ( Vector3 position )
-		{
-			RemoveBlock ( m_Blocks [ position ] );
-		}
+        public virtual void RemoveBlockAt(Vector3 position)
+        {
+            RemoveBlock(m_Blocks[position]);
+        }
 
-		public virtual void RemoveBlock ( Block block )
-		{
-			block.OnRemove ( this );
-			Destroy ( m_Blocks [ block.transform.position ].gameObject );
-			m_Blocks.Remove ( block.transform.position );
-		}
+        public virtual void RemoveBlock(Block block)
+        {
+            block.OnRemove(this);
+            Destroy(m_Blocks[block.transform.position].gameObject);
+            m_Blocks.Remove(block.transform.position);
+        }
 
-		public virtual void RemoveBackgroundBlock ( BackgroundBlock block )
-		{
-			block.OnRemove ( this );
-			Destroy ( m_BackgroundBlocks [ block.transform.position ].gameObject );
-			m_BackgroundBlocks.Remove ( block.transform.position );
-		}
+        public virtual void RemoveBackgroundBlock(BackgroundBlock block)
+        {
+            block.OnRemove(this);
+            Destroy(m_BackgroundBlocks[block.transform.position].gameObject);
+            m_BackgroundBlocks.Remove(block.transform.position);
+        }
 
-		public virtual bool CreateBlock ( Block blockPrefab, Vector3 position )
+        public virtual bool CreateBlock ( Block blockPrefab, Vector3 position )
 		{
 			if ( blockPrefab == null )
 			{
@@ -312,32 +246,118 @@ namespace RedRunner.TerrainGeneration
 			return characterBlock;
 		}
 
-		public static Block ChooseFrom ( Block[] blocks )
-		{
-			if ( blocks.Length <= 0 )
-			{
-				return null;
-			}
-			float total = 0;
-			for ( int i = 0; i < blocks.Length; i++ )
-			{
-				total += blocks [ i ].Probability;
-			}
-			float randomPoint = Random.value * total;
-			for ( int i = 0; i < blocks.Length; i++ )
-			{
-				if ( randomPoint < blocks [ i ].Probability )
-				{
-					return blocks [ i ];
-				}
-				else
-				{
-					randomPoint -= blocks [ i ].Probability;
-				}
-			}
-			return blocks [ blocks.Length - 1 ];
-		}
+        public virtual void Generate()
+        {
+            if (m_CurrentX < m_Settings.LevelLength || m_Settings.LevelLength <= 0)
+            {
+                bool isEnd = false, isStart = false, isMiddle = false;
+                Block block = null;
+                Vector3 current = new Vector3(m_CurrentX, 0f, 0f);
+                float newX = 0f;
+                if (m_GeneratedStartBlocksCount < m_Settings.StartBlocksCount || m_Settings.StartBlocksCount <= 0)
+                {
+                    isStart = true;
+                    block = ChooseFrom(m_Settings.StartBlocks);
+                }
+                else if (m_GeneratedMiddleBlocksCount < m_Settings.MiddleBlocksCount || m_Settings.MiddleBlocksCount <= 0)
+                {
+                    isMiddle = true;
+                    block = ChooseFrom(m_Settings.MiddleBlocks);
+                }
+                else if (m_GeneratedEndBlocksCount < m_Settings.EndBlocksCount || m_Settings.EndBlocksCount <= 0)
+                {
+                    isEnd = true;
+                    block = ChooseFrom(m_Settings.EndBlocks);
+                }
+                if (m_LastBlock != null)
+                {
+                    newX = m_CurrentX + m_LastBlock.Width;
+                }
+                else
+                {
+                    newX = 0f;
+                }
+                if (block != null && (m_LastBlock == null || newX < m_Character.transform.position.x + m_GenerateRange))
+                {
+                    if (isStart)
+                    {
+                        if (m_Settings.StartBlocksCount > 0)
+                        {
+                            m_GeneratedStartBlocksCount++;
+                        }
+                    }
+                    else if (isMiddle)
+                    {
+                        if (m_Settings.MiddleBlocksCount > 0)
+                        {
+                            m_GeneratedMiddleBlocksCount++;
+                        }
+                    }
+                    else if (isEnd)
+                    {
+                        if (m_Settings.EndBlocksCount > 0)
+                        {
+                            m_GeneratedEndBlocksCount++;
+                        }
+                    }
+                    CreateBlock(block, current);
+                }
+            }
+            GenerateBGWhilePlaying();
+        }
 
-	}
+        void GenerateBGWhilePlaying()
+        {
+            for (int i = 0; i < m_BackgroundLayers.Length; i++)
+            {
+                int random = Random.Range(0, 2);
+                bool generate = random == 1 ? true : false;
+                if (!generate)
+                {
+                    continue;
+                }
+                Vector3 current = new Vector3(m_BackgroundLayers[i].CurrentX, 0f, 0f);
+                BackgroundBlock block = (BackgroundBlock)ChooseFrom(m_BackgroundLayers[i].Blocks);
+                float newX = 0f;
+                if (m_BackgroundLayers[i].LastBlock != null)
+                {
+                    newX = m_BackgroundLayers[i].CurrentX + m_BackgroundLayers[i].LastBlock.Width;
+                }
+                else
+                {
+                    newX = 0f;
+                }
+                if (block != null && (m_BackgroundLayers[i].LastBlock == null || newX < m_Character.transform.position.x + m_BackgroundGenerateRange))
+                {
+                    CreateBackgroundBlock(block, current, m_BackgroundLayers[i], i);
+                }
+            }
+        }
 
+        public static Block ChooseFrom(Block[] blocks)
+        {
+            if (blocks.Length <= 0)
+            {
+                return null;
+            }
+            float total = 0;
+            for (int i = 0; i < blocks.Length; i++)
+            {
+                total += blocks[i].Probability;
+            }
+            float randomPoint = Random.value * total;
+            for (int i = 0; i < blocks.Length; i++)
+            {
+                if (randomPoint < blocks[i].Probability)
+                {
+                    return blocks[i];
+                }
+                else
+                {
+                    randomPoint -= blocks[i].Probability;
+                }
+            }
+            return blocks[blocks.Length - 1];
+        }
+    }
 }
